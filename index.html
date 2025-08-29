@@ -141,12 +141,12 @@
 
         input[type="text"] {
             flex: 1;
-            padding: 10px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
+            padding: 8px 10px;
+            border: 1px solid #000;
+            border-radius: 4px;
             font-size: 0.9em;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             cursor: text;
@@ -157,19 +157,17 @@
 
         input[type="text"]:focus {
             outline: none;
-            border-color: rgba(116, 185, 255, 0.8);
-            background: rgba(255, 255, 255, 0.95);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(116, 185, 255, 0.2);
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 1);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
         }
 
         input[type="number"] {
             width: 70px;
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border: 1px solid #000;
+            border-radius: 4px;
             font-size: 0.9em;
             text-align: center;
             background: rgba(255, 255, 255, 0.9);
@@ -187,7 +185,7 @@
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #74b9ff;
+            border-color: #667eea;
             background: rgba(255, 255, 255, 1);
         }
 
@@ -312,19 +310,34 @@
         .essential-controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
         
         .compact-row {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             align-items: center;
         }
         
         .compact-input {
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
+        }
+        
+        /* Collapsed mode optimizations */
+        .ui-overlay.collapsed .essential-controls {
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .ui-overlay.collapsed .compact-row {
+            gap: 3px;
+        }
+        
+        .ui-overlay.collapsed button {
+            padding: 6px 10px;
+            font-size: 0.85em;
         }
 
         .generations-header {
@@ -498,20 +511,20 @@
     </div>
 
     <!-- Draggable UI overlay -->
-    <div class="ui-overlay" id="uiOverlay">
+    <div class="ui-overlay collapsed" id="uiOverlay">
         <div class="drag-handle" id="dragHandle"></div>
-        <button class="collapse-toggle" id="collapseToggle">−</button>
+        <button class="collapse-toggle" id="collapseToggle">+</button>
         
         <!-- Essential controls - always visible -->
         <div class="essential-controls">
             <div class="compact-row">
                 <input type="text" id="promptInput" class="compact-input" placeholder="AI prompt..." value="Artificial intelligence will">
-                <input type="number" id="numGenerations" min="2" max="15" value="5" style="width: 50px;">
+                <input type="number" id="numGenerations" min="2" max="15" value="5" style="width: 45px;">
+                <button id="generateBtn">▶</button>
             </div>
             <div class="compact-row">
-                <button id="generateBtn" style="flex: 1;">▶</button>
-                <button id="randomBtn">🎲</button>
-                <span id="timingDisplay" style="font-size: 0.8em; color: #74b9ff; min-width: 60px;"></span>
+                <button id="randomBtn" style="flex: 1;">🎲 Random</button>
+                <span id="timingDisplay" style="font-size: 0.8em; color: #74b9ff; min-width: 50px; text-align: center;"></span>
             </div>
         </div>
         
