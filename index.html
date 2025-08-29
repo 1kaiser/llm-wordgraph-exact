@@ -14,16 +14,18 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
-                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.2), transparent 50%),
-                linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+                radial-gradient(circle at 20% 30%, rgba(255, 107, 107, 0.4), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(72, 219, 251, 0.4), transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 193, 7, 0.3), transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(156, 39, 176, 0.3), transparent 50%),
+                radial-gradient(circle at 10% 90%, rgba(76, 175, 80, 0.3), transparent 50%),
+                linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 25%, #45b7d1 50%, #96ceb4 75%, #ffeaa7 100%);
             height: 100vh;
             overflow: hidden;
             position: relative;
         }
         
-        /* Grain texture overlay */
+        /* Colorful sparkle overlay */
         body::before {
             content: '';
             position: fixed;
@@ -32,26 +34,34 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            opacity: 0.03;
+            opacity: 0.1;
             z-index: 1;
             background-image: 
-                radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px),
-                radial-gradient(circle at 75% 75%, #fff 0.5px, transparent 0.5px);
-            background-size: 50px 50px, 30px 30px;
-            animation: grain 8s steps(10) infinite;
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(255, 193, 7, 0.6) 0.5px, transparent 0.5px),
+                radial-gradient(circle at 50% 50%, rgba(255, 107, 107, 0.4) 1px, transparent 1px),
+                radial-gradient(circle at 80% 30%, rgba(72, 219, 251, 0.5) 0.8px, transparent 0.8px);
+            background-size: 60px 60px, 40px 40px, 80px 80px, 50px 50px;
+            animation: sparkle 6s ease-in-out infinite;
         }
         
-        @keyframes grain {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-5%, -10%); }
-            20% { transform: translate(-15%, 5%); }
-            30% { transform: translate(7%, -25%); }
-            40% { transform: translate(-5%, 25%); }
-            50% { transform: translate(-15%, 10%); }
-            60% { transform: translate(15%, 0%); }
-            70% { transform: translate(0%, 15%); }
-            80% { transform: translate(3%, -10%); }
-            90% { transform: translate(-10%, 5%); }
+        @keyframes sparkle {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 0.1;
+            }
+            25% { 
+                transform: translate(-2%, -3%) scale(1.1); 
+                opacity: 0.15;
+            }
+            50% { 
+                transform: translate(2%, 2%) scale(0.9); 
+                opacity: 0.08;
+            }
+            75% { 
+                transform: translate(-1%, 3%) scale(1.05); 
+                opacity: 0.12;
+            }
         }
 
         /* Full screen graph container */
@@ -69,31 +79,32 @@
             height: 100%;
         }
 
-        /* Dark glassmorphism UI overlay with grain effect */
+        /* Bright colorful glassmorphism UI overlay */
         .ui-overlay {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(28, 28, 28, 0.7);
-            backdrop-filter: blur(24px) saturate(1.8) brightness(1.2);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(2.2) brightness(1.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 24px;
             padding: 20px;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.6),
-                0 16px 64px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+                0 8px 32px rgba(255, 107, 107, 0.2),
+                0 16px 64px rgba(72, 219, 251, 0.15),
+                0 4px 16px rgba(255, 193, 7, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.2);
             z-index: 1000;
             cursor: move;
             min-width: 320px;
             max-width: 400px;
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(2.2) brightness(1.3);
             position: relative;
         }
         
-        /* Subtle inner grain texture for overlay */
+        /* Colorful inner sparkle texture for overlay */
         .ui-overlay::before {
             content: '';
             position: absolute;
@@ -101,26 +112,30 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 20px;
+            border-radius: 24px;
             pointer-events: none;
-            opacity: 0.02;
+            opacity: 0.08;
             background-image: 
-                radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
-                radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px);
-            background-size: 60px 60px, 40px 40px;
+                radial-gradient(circle at 30% 40%, rgba(255, 107, 107, 0.6) 1.5px, transparent 1.5px),
+                radial-gradient(circle at 70% 20%, rgba(72, 219, 251, 0.5) 1px, transparent 1px),
+                radial-gradient(circle at 20% 80%, rgba(255, 193, 7, 0.7) 0.8px, transparent 0.8px),
+                radial-gradient(circle at 80% 60%, rgba(156, 39, 176, 0.4) 1.2px, transparent 1.2px);
+            background-size: 50px 50px, 70px 70px, 40px 40px, 60px 60px;
+            animation: sparkle 8s ease-in-out infinite;
         }
 
         .ui-overlay:hover {
-            background: rgba(32, 32, 32, 0.75);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.35);
+            border-color: rgba(255, 255, 255, 0.6);
             box-shadow: 
-                0 12px 48px rgba(0, 0, 0, 0.7),
-                0 20px 80px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-            backdrop-filter: blur(32px) saturate(2.0) brightness(1.25);
-            -webkit-backdrop-filter: blur(32px) saturate(2.0) brightness(1.25);
+                0 12px 48px rgba(255, 107, 107, 0.3),
+                0 20px 80px rgba(72, 219, 251, 0.25),
+                0 8px 32px rgba(255, 193, 7, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            backdrop-filter: blur(28px) saturate(2.5) brightness(1.4);
+            -webkit-backdrop-filter: blur(28px) saturate(2.5) brightness(1.4);
         }
 
         /* Drag handle - bottom right corner */
@@ -173,28 +188,33 @@
 
         .ui-header h1 {
             font-size: 1.4em;
-            color: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 5px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
         }
 
         .ui-header p {
             font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(60, 60, 60, 0.8);
             margin-bottom: 10px;
+            font-weight: 500;
         }
 
         .network-info {
             font-size: 0.8em;
-            color: rgba(120, 219, 255, 0.9);
-            background: rgba(120, 219, 255, 0.15);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 6px 12px;
-            border-radius: 12px;
+            color: rgba(72, 219, 251, 1);
+            background: linear-gradient(135deg, rgba(72, 219, 251, 0.2), rgba(255, 107, 107, 0.1));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 8px 14px;
+            border-radius: 16px;
             margin-bottom: 15px;
-            border: 1px solid rgba(120, 219, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-weight: 600;
         }
 
         /* Form controls */
@@ -221,59 +241,62 @@
         input[type="text"] {
             flex: 1;
             padding: 8px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
             font-size: 0.9em;
             transition: all 0.3s ease;
-            background: rgba(40, 40, 40, 0.6);
-            backdrop-filter: blur(20px) saturate(1.4);
-            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px) saturate(1.8);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8);
             cursor: text;
             user-select: text;
             -webkit-user-select: text;
             -moz-user-select: text;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(60, 60, 60, 0.9);
+            font-weight: 500;
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-                0 2px 8px rgba(0, 0, 0, 0.2);
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+                0 4px 12px rgba(255, 107, 107, 0.1);
         }
         
         input[type="text"]::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(100, 100, 100, 0.6);
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: rgba(120, 119, 198, 0.6);
-            background: rgba(45, 45, 45, 0.7);
-            backdrop-filter: blur(24px) saturate(1.6);
-            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            border-color: rgba(255, 107, 107, 0.8);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(24px) saturate(2.2);
+            -webkit-backdrop-filter: blur(24px) saturate(2.2);
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-                0 0 0 2px rgba(120, 119, 198, 0.3),
-                0 4px 12px rgba(0, 0, 0, 0.3);
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+                0 0 0 3px rgba(255, 107, 107, 0.3),
+                0 6px 16px rgba(72, 219, 251, 0.2);
         }
 
         input[type="number"] {
             width: 70px;
             padding: 6px 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 193, 7, 0.5);
             border-radius: 12px;
             font-size: 0.9em;
             text-align: center;
-            background: rgba(40, 40, 40, 0.6);
-            backdrop-filter: blur(20px) saturate(1.4);
-            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px) saturate(2.0) brightness(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(2.0) brightness(1.2);
             cursor: text;
             -webkit-appearance: auto;
             -moz-appearance: textfield;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(60, 60, 60, 0.9);
+            font-weight: 600;
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-                0 2px 8px rgba(0, 0, 0, 0.2);
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 rgba(255, 193, 7, 0.2),
+                0 4px 12px rgba(255, 193, 7, 0.2),
+                0 2px 6px rgba(255, 107, 107, 0.1);
         }
 
         input[type="number"]::-webkit-outer-spin-button,
@@ -285,56 +308,63 @@
 
         input[type="number"]:focus {
             outline: none;
-            border-color: rgba(120, 119, 198, 0.6);
-            background: rgba(45, 45, 45, 0.7);
-            backdrop-filter: blur(24px) saturate(1.6);
-            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            border-color: rgba(255, 107, 107, 0.8);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(28px) saturate(2.5) brightness(1.4);
+            -webkit-backdrop-filter: blur(28px) saturate(2.5) brightness(1.4);
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-                0 0 0 2px rgba(120, 119, 198, 0.3),
-                0 4px 12px rgba(0, 0, 0, 0.3);
+                inset 0 1px 0 rgba(255, 255, 255, 1),
+                inset 0 -1px 0 rgba(255, 107, 107, 0.3),
+                0 0 0 3px rgba(255, 107, 107, 0.4),
+                0 6px 16px rgba(255, 193, 7, 0.3),
+                0 4px 12px rgba(72, 219, 251, 0.2);
         }
 
         button {
-            background: rgba(120, 119, 198, 0.3);
-            color: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.8), rgba(72, 219, 251, 0.7));
+            color: rgba(255, 255, 255, 1);
             border: none;
             padding: 8px 12px;
-            border-radius: 12px;
+            border-radius: 16px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             font-size: 0.9em;
             transition: all 0.3s ease;
             white-space: nowrap;
-            backdrop-filter: blur(20px) saturate(1.5) brightness(1.1);
-            -webkit-backdrop-filter: blur(20px) saturate(1.5) brightness(1.1);
+            backdrop-filter: blur(20px) saturate(1.8) brightness(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-                0 4px 12px rgba(120, 119, 198, 0.2),
-                0 2px 8px rgba(0, 0, 0, 0.3);
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+                0 4px 15px rgba(255, 107, 107, 0.4),
+                0 2px 8px rgba(72, 219, 251, 0.3);
         }
 
         button:hover {
-            background: rgba(120, 119, 198, 0.4);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 1), rgba(72, 219, 251, 0.9));
             color: white;
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-                0 6px 16px rgba(120, 119, 198, 0.3),
-                0 4px 12px rgba(0, 0, 0, 0.4);
-            transform: translateY(-1px);
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+                0 6px 20px rgba(255, 107, 107, 0.5),
+                0 4px 15px rgba(72, 219, 251, 0.4),
+                0 8px 25px rgba(255, 193, 7, 0.2);
+            transform: translateY(-2px);
+            backdrop-filter: blur(25px) saturate(2.2) brightness(1.3);
+            -webkit-backdrop-filter: blur(25px) saturate(2.2) brightness(1.3);
         }
 
         button:active {
-            background: rgba(120, 119, 198, 0.5);
-            transform: translateY(0px);
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(72, 219, 251, 0.8));
+            transform: translateY(1px);
             box-shadow: 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-                0 3px 8px rgba(120, 119, 198, 0.4),
-                0 2px 6px rgba(0, 0, 0, 0.5);
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 2px 8px rgba(255, 107, 107, 0.6),
+                0 4px 12px rgba(72, 219, 251, 0.4);
+            backdrop-filter: blur(15px) saturate(1.5) brightness(1.1);
+            -webkit-backdrop-filter: blur(15px) saturate(1.5) brightness(1.1);
         }
 
         .button-group {
@@ -353,22 +383,34 @@
 
         .stat {
             text-align: center;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 193, 7, 0.2));
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(15px) saturate(1.8);
+            -webkit-backdrop-filter: blur(15px) saturate(1.8);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                0 4px 12px rgba(255, 107, 107, 0.1),
+                0 2px 6px rgba(72, 219, 251, 0.1);
         }
 
         .stat-label {
-            font-size: 0.7em;
-            color: #6c757d;
+            font-size: 0.75em;
+            color: rgba(100, 100, 100, 0.8);
             display: block;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
         }
 
         .stat-value {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #495057;
+            font-size: 1.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
         }
 
         /* Generation list - collapsible */
@@ -485,20 +527,31 @@
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            padding: 8px 12px;
-            background: rgba(116, 185, 255, 0.1);
-            border-radius: 8px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(72, 219, 251, 0.12));
+            border-radius: 12px;
             margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
         }
 
         .generations-header h3 {
             font-size: 0.9em;
-            color: #667eea;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin: 0;
+            font-weight: 600;
         }
 
         .toggle-icon {
-            color: #667eea;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-weight: bold;
             transition: transform 0.3s ease;
         }
@@ -598,31 +651,45 @@
         }
 
         .zoom-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            color: #495057;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 193, 7, 0.2));
+            backdrop-filter: blur(20px) saturate(1.8) brightness(1.2);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8) brightness(1.2);
+            color: rgba(60, 60, 60, 0.9);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                0 4px 15px rgba(255, 107, 107, 0.2),
+                0 2px 8px rgba(72, 219, 251, 0.15);
         }
 
         .zoom-btn:hover {
-            background: white;
-            border-color: #ccc;
-            color: #333;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 193, 7, 0.4));
+            border-color: rgba(255, 107, 107, 0.6);
+            color: rgba(60, 60, 60, 1);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 1),
+                0 6px 20px rgba(255, 107, 107, 0.3),
+                0 4px 12px rgba(72, 219, 251, 0.25);
+            transform: translateY(-2px);
         }
 
         .zoom-btn:active {
-            background: #f5f5f5;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 193, 7, 0.3));
             transform: translateY(1px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                0 2px 8px rgba(255, 107, 107, 0.4),
+                0 4px 12px rgba(72, 219, 251, 0.2);
         }
 
         /* Responsive adjustments */
@@ -671,28 +738,28 @@
         <!-- Collapsible content -->
         <div class="ui-collapsible" id="uiCollapsible">
             <div class="ui-header">
-                <h1>🧠 LLM Word Graph</h1>
-                <p>Exact visualization of language patterns</p>
+                <h1>🚀✨ AI Word Graph Magic ✨🚀</h1>
+                <p>🎨 Beautiful visualization of language patterns 🎨</p>
                 <div class="network-info" id="networkInfo">
-                    🌐 <span id="networkAddress">Loading...</span>
+                    🌍💫 <span id="networkAddress">Loading...</span> 💫🌍
                 </div>
             </div>
 
             <div class="button-group">
-                <button id="testBtn">Run Tests</button>
+                <button id="testBtn">🧪 Run Tests 🧪</button>
             </div>
 
         <div class="stats">
             <div class="stat">
-                <span class="stat-label">Words</span>
+                <span class="stat-label">📝 Words</span>
                 <span class="stat-value" id="wordCount">0</span>
             </div>
             <div class="stat">
-                <span class="stat-label">Links</span>
+                <span class="stat-label">🔗 Links</span>
                 <span class="stat-value" id="linkCount">0</span>
             </div>
             <div class="stat">
-                <span class="stat-label">Gens</span>
+                <span class="stat-label">✨ Gens</span>
                 <span class="stat-value" id="genCount">0</span>
             </div>
         </div>
@@ -700,7 +767,7 @@
             <!-- Collapsible generations list -->
             <div class="generations-section" id="generationsSection">
                 <div class="generations-header" onclick="toggleGenerationsList()">
-                    <h3>Generated Outputs <span id="totalCount">(0)</span></h3>
+                    <h3>🎯✨ Generated Outputs <span id="totalCount">(0)</span> ✨🎯</h3>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="generations-list" id="generationsList"></div>
