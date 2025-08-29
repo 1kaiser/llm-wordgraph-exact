@@ -13,102 +13,166 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+            height: 100vh;
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            padding: 30px;
+        /* Full screen graph container */
+        .graph-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        #graph {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Draggable UI overlay - top left */
+        .ui-overlay {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            cursor: move;
+            min-width: 320px;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+
+        .ui-overlay:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Drag handle - bottom right corner */
+        .drag-handle {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: nw-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .drag-handle::before {
+            content: "⋮⋮";
+            transform: rotate(45deg);
+            font-size: 8px;
+            line-height: 1;
+        }
+
+        /* UI Header */
+        .ui-header {
             text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
             margin-bottom: 15px;
         }
 
-        .network-info {
-            font-size: 0.9em;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
-        .controls {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .input-group label {
+        .ui-header h1 {
+            font-size: 1.4em;
+            color: #2d3436;
+            margin-bottom: 5px;
             font-weight: 600;
-            color: #495057;
-            min-width: 120px;
+        }
+
+        .ui-header p {
+            font-size: 0.9em;
+            color: #636e72;
+            margin-bottom: 10px;
+        }
+
+        .network-info {
+            font-size: 0.8em;
+            color: #74b9ff;
+            background: rgba(116, 185, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Form controls */
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
         }
 
         input[type="text"] {
-            padding: 12px 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            font-size: 14px;
-            width: 400px;
-            transition: border-color 0.3s ease;
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #4facfe;
+            border-color: #74b9ff;
+            background: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(116, 185, 255, 0.2);
         }
 
         input[type="number"] {
-            width: 80px;
-            padding: 12px;
-            border: 2px solid #dee2e6;
+            width: 60px;
+            padding: 8px 10px;
+            border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 0.9em;
             text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #74b9ff;
         }
 
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 0.9em;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         button:hover {
@@ -116,54 +180,93 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .stats {
+        .button-group {
             display: flex;
-            gap: 20px;
-            margin-left: auto;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Stats display */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 15px;
         }
 
         .stat {
             text-align: center;
-            padding: 10px 15px;
-            background: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-width: 80px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .stat-label {
-            font-size: 12px;
+            font-size: 0.7em;
             color: #6c757d;
             display: block;
         }
 
         .stat-value {
-            font-size: 20px;
+            font-size: 1.1em;
             font-weight: 600;
             color: #495057;
         }
 
+        /* Generation list - collapsible */
         .generations-section {
-            padding: 20px 30px;
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-            border-bottom: 1px solid #e9ecef;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            margin-top: 15px;
+        }
+
+        .generations-section.open {
+            max-height: 300px;
+        }
+
+        .generations-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: rgba(116, 185, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .generations-header h3 {
+            font-size: 0.9em;
+            color: #667eea;
+            margin: 0;
+        }
+
+        .toggle-icon {
+            color: #667eea;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .generations-section.open .toggle-icon {
+            transform: rotate(180deg);
         }
 
         .generations-list {
-            display: grid;
-            gap: 12px;
-            margin-top: 15px;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
+            padding: 0 5px;
         }
 
         .generation-item {
-            background: white;
-            border: 2px solid #e9ecef;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 8px;
-            padding: 15px;
-            font-size: 14px;
-            line-height: 1.5;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            font-size: 0.8em;
+            line-height: 1.3;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
@@ -171,53 +274,29 @@
 
         .generation-item:hover {
             border-color: #667eea;
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.05);
+            transform: translateX(2px);
         }
 
         .generation-item.selected {
             border-color: #667eea;
-            background: linear-gradient(135deg, #f8f9ff 0%, #f5f3ff 100%);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.1);
         }
 
         .generation-number {
             position: absolute;
-            top: 8px;
-            right: 12px;
+            top: 5px;
+            right: 8px;
             background: #667eea;
             color: white;
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 0.7em;
             font-weight: bold;
-        }
-
-        .graph-container {
-            position: relative;
-            height: calc(100vh - 400px);
-            min-height: 600px;
-            overflow: hidden;
-            background: radial-gradient(circle at center, #ffffff 0%, #f8f9fa 100%);
-        }
-        
-        .fullscreen-graph {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999;
-            background: white;
-        }
-
-        #graph {
-            width: 100%;
-            height: 100%;
         }
 
         /* Graph styling - exact from llm-consistency-vis */
@@ -252,21 +331,25 @@
             stroke-opacity: 0.8 !important;
         }
 
+        /* Zoom controls - right side */
         .zoom-controls {
-            position: absolute;
-            top: 20px;
+            position: fixed;
+            top: 50%;
             right: 20px;
+            transform: translateY(-50%);
             display: flex;
             flex-direction: column;
             gap: 8px;
+            z-index: 1000;
         }
 
         .zoom-btn {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: none;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             color: #495057;
             cursor: pointer;
             display: flex;
@@ -274,74 +357,171 @@
             justify-content: center;
             font-size: 18px;
             font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
         }
 
         .zoom-btn:hover {
             background: white;
             transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .ui-overlay {
+                min-width: 280px;
+                max-width: 320px;
+                padding: 15px;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <!-- Full screen graph -->
+    <div class="graph-container">
+        <svg id="graph"></svg>
+    </div>
+
+    <!-- Draggable UI overlay -->
+    <div class="ui-overlay" id="uiOverlay">
+        <div class="drag-handle" id="dragHandle"></div>
+        
+        <div class="ui-header">
             <h1>🧠 LLM Word Graph</h1>
-            <p>Exact visualization of language model generation patterns</p>
-            <div class="network-info">
-                <span>🌐 Local: <code>http://localhost:5173</code></span>
-                <span id="networkAddress">🌍 Network: <code>Detecting...</code></span>
+            <p>Exact visualization of language patterns</p>
+            <div class="network-info" id="networkInfo">
+                🌐 <span id="networkAddress">Loading...</span>
             </div>
         </div>
 
-        <div class="controls">
-            <div class="input-group">
-                <label for="promptInput">LLM Prompt:</label>
-                <input type="text" id="promptInput" placeholder="Enter a prompt for LLM completions..." value="Translate this to English: Baudelaire poetry">
+        <div class="control-group">
+            <label for="promptInput">LLM Prompt:</label>
+            <input type="text" id="promptInput" placeholder="Enter prompt..." value="Translate Baudelaire poetry">
+        </div>
+
+        <div class="control-row">
+            <label for="numGenerations">Count:</label>
+            <input type="number" id="numGenerations" min="2" max="10" value="5">
+            <button id="generateBtn">Generate</button>
+            <button id="randomBtn">Random</button>
+        </div>
+
+        <div class="button-group">
+            <button id="testBtn">Run Tests</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">Words</span>
+                <span class="stat-value" id="wordCount">0</span>
             </div>
-            
-            <div class="input-group">
-                <label for="numGenerations">Generations:</label>
-                <input type="number" id="numGenerations" min="2" max="10" value="5">
+            <div class="stat">
+                <span class="stat-label">Links</span>
+                <span class="stat-value" id="linkCount">0</span>
             </div>
-            
-            <button id="generateBtn">Generate LLM Outputs</button>
-            <button id="randomBtn">Random Sample</button>
-            
-            <div class="stats">
-                <div class="stat">
-                    <span class="stat-label">Words</span>
-                    <span class="stat-value" id="wordCount">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Links</span>
-                    <span class="stat-value" id="linkCount">0</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Generations</span>
-                    <span class="stat-value" id="genCount">0</span>
-                </div>
+            <div class="stat">
+                <span class="stat-label">Gens</span>
+                <span class="stat-value" id="genCount">0</span>
             </div>
         </div>
 
-        <div class="generations-section" id="generationsSection" style="display: none;">
-            <h3>📝 Generated LLM Outputs <span id="totalCount">(0)</span></h3>
+        <!-- Collapsible generations list -->
+        <div class="generations-section" id="generationsSection">
+            <div class="generations-header" onclick="toggleGenerationsList()">
+                <h3>Generated Outputs <span id="totalCount">(0)</span></h3>
+                <span class="toggle-icon">▼</span>
+            </div>
             <div class="generations-list" id="generationsList"></div>
-        </div>
-
-        <div class="graph-container">
-            <svg id="graph"></svg>
-            <div class="zoom-controls">
-                <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
-                <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
-                <button class="zoom-btn" id="resetZoom" title="Reset Zoom">⌂</button>
-                <button class="zoom-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
-            </div>
         </div>
     </div>
 
+    <!-- Zoom controls -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
+        <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
+        <button class="zoom-btn" id="resetZoom" title="Reset">⌂</button>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
+    
+    <script>
+        // Make UI draggable
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+        
+        const uiOverlay = document.getElementById('uiOverlay');
+        const dragHandle = document.getElementById('dragHandle');
+        
+        function makeDraggable() {
+            uiOverlay.addEventListener('mousedown', startDrag);
+            dragHandle.addEventListener('mousedown', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                const rect = uiOverlay.getBoundingClientRect();
+                startLeft = rect.left;
+                startTop = rect.top;
+                
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', stopDrag);
+                
+                uiOverlay.style.transition = 'none';
+                e.preventDefault();
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                let newLeft = startLeft + deltaX;
+                let newTop = startTop + deltaY;
+                
+                // Keep within viewport bounds
+                const maxLeft = window.innerWidth - uiOverlay.offsetWidth;
+                const maxTop = window.innerHeight - uiOverlay.offsetHeight;
+                
+                newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                newTop = Math.max(0, Math.min(newTop, maxTop));
+                
+                uiOverlay.style.left = newLeft + 'px';
+                uiOverlay.style.top = newTop + 'px';
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                
+                setTimeout(() => {
+                    uiOverlay.style.transition = 'all 0.3s ease';
+                }, 100);
+            }
+        }
+        
+        function toggleGenerationsList() {
+            const section = document.getElementById('generationsSection');
+            section.classList.toggle('open');
+        }
+        
+        // Initialize draggable functionality
+        window.addEventListener('load', () => {
+            makeDraggable();
+        });
+    </script>
 </body>
 </html>

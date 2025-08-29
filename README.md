@@ -4,6 +4,17 @@
 
 This project implements the **exact word graph visualization algorithm** from [llm-consistency-vis](https://github.com/anthropics/llm-consistency-vis), specifically designed to visualize multiple LLM text completions and their word relationship patterns.
 
+## 📋 CLAUDE.md Integration
+
+This project is part of the multi-project workspace documented in `/home/kaiser/claude_projects/CLAUDE.md`. It represents the exact replication of the llm-consistency-vis word graph algorithms with enhanced features:
+
+- **Full Screen Visualization**: Utilizes entire viewport for complex pattern analysis
+- **Realistic LLM Data**: Based on actual translation variations from research examples  
+- **Exact Algorithm Matching**: Verified through comprehensive test suites
+- **Interactive Comparisons**: Side-by-side testing with original implementation
+
+**Status**: ✅ **FULLY OPERATIONAL** - Complete exact implementation with full screen capabilities and comprehensive testing
+
 ## ✨ Key Features
 
 - **Exact Algorithm**: Direct implementation of the tokenization, similarity calculation, and positioning algorithms

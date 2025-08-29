@@ -44,12 +44,12 @@ class LLMWordGraphExact {
         // Generation controls
         d3.select('#generateBtn').on('click', () => this.generateLLMOutputs());
         d3.select('#randomBtn').on('click', () => this.loadRandomSample());
+        d3.select('#testBtn').on('click', () => this.runComparisonTests());
         
         // Zoom controls
         d3.select('#zoomIn').on('click', () => this.zoom(1.5));
         d3.select('#zoomOut').on('click', () => this.zoom(1/1.5));
         d3.select('#resetZoom').on('click', () => this.resetZoom());
-        d3.select('#fullscreenBtn').on('click', () => this.toggleFullscreen());
 
         // Window resize
         window.addEventListener('resize', () => {
@@ -259,26 +259,35 @@ class LLMWordGraphExact {
         }
     }
 
-    // Exact positioning functions from llm-consistency-vis
+    // Enhanced positioning with centered graph and 10% margins
     private getExpectedX(d: NodeDatum): number {
-        const padBetweenWords = 50;
+        const width = window.innerWidth;
+        const graphMarginPercent = 0.1;
+        const graphLeftMargin = width * graphMarginPercent;
+        const graphWidth = width * (1 - 2 * graphMarginPercent);
+        
+        const padBetweenWords = Math.max(30, graphWidth / 50); // Dynamic padding based on screen width
         const parents = d.parents.filter(p => this.selectedNode ? this.nodeIsInSents(p) : true);
         
         if (d.isRoot && !parents.length) {
-            return padBetweenWords;
+            return graphLeftMargin + padBetweenWords;
         }
         if (!parents.length) {
-            return d.x;
+            return d.x || graphLeftMargin + padBetweenWords;
         }
         if (this.selectedNode && !this.nodeIsInSents(d)) {
-            return d.x;
+            return d.x || graphLeftMargin + padBetweenWords;
         }
         
         const parentRights = parents.map((p: NodeDatum) => {
-            return p.x + this.textLength(p) + padBetweenWords;
+            return (p.x || 0) + this.textLength(p) + padBetweenWords;
         });
         
-        return d3.mean(parentRights) || d.x;
+        const calculatedX = d3.mean(parentRights) || (d.x || graphLeftMargin + padBetweenWords);
+        
+        // Ensure word stays within graph boundaries
+        const maxX = graphLeftMargin + graphWidth - this.textLength(d) - padBetweenWords;
+        return Math.min(calculatedX, maxX);
     }
 
     private getExpectedY(d: NodeDatum, height: number): number {
@@ -386,11 +395,15 @@ class LLMWordGraphExact {
         d3.select('#linkCount').text(linksData.length);
         d3.select('#genCount').text(generations.length);
 
-        // Use full screen dimensions for better visualization
-        const container = d3.select('.graph-container').node() as HTMLElement;
-        const isFullscreen = container.classList.contains('fullscreen-graph');
-        const width = isFullscreen ? window.innerWidth : Math.min(window.innerWidth * 0.95, 5000);
-        const height = isFullscreen ? window.innerHeight : container.getBoundingClientRect().height;
+        // Use full viewport dimensions with 10% margins for graph positioning
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
+        // Calculate graph boundaries (10% margins from left and right)
+        const graphMarginPercent = 0.1;
+        const graphLeftMargin = width * graphMarginPercent;
+        const graphRightMargin = width * graphMarginPercent;
+        const graphWidth = width - graphLeftMargin - graphRightMargin;
         
         const svg = d3.select("#graph")
             .html('')
@@ -607,7 +620,7 @@ class LLMWordGraphExact {
     }
 
     private displayGenerations(generations: string[]) {
-        const section = d3.select('#generationsSection').style('display', 'block');
+        const section = d3.select('#generationsSection');
         const list = d3.select('#generationsList');
         
         d3.select('#totalCount').text(`(${generations.length})`);
@@ -620,10 +633,17 @@ class LLMWordGraphExact {
             .append('div')
             .attr('class', 'generation-item')
             .on('click', (event, d) => {
+                const isSelected = d3.select(event.currentTarget).classed('selected');
                 d3.selectAll('.generation-item').classed('selected', false);
-                d3.select(event.currentTarget).classed('selected', true);
-                // Re-render with focus on selected generation
-                this.renderGraph([d]);
+                
+                if (!isSelected) {
+                    d3.select(event.currentTarget).classed('selected', true);
+                    // Re-render with focus on selected generation
+                    this.renderGraph([d]);
+                } else {
+                    // Re-render with all generations if deselecting
+                    this.renderGraph(generations);
+                }
             });
 
         items.append('div')
@@ -631,7 +651,11 @@ class LLMWordGraphExact {
             .text((d, i) => `${i + 1}`);
 
         items.append('div')
+            .style('padding-right', '25px') // Make room for number
             .text(d => d);
+            
+        // Auto-expand the list when generations are added
+        section.classed('open', true);
     }
 
     // Zoom controls
@@ -655,22 +679,22 @@ class LLMWordGraphExact {
         }
     }
 
-    // Fullscreen toggle
-    private toggleFullscreen() {
-        const container = d3.select('.graph-container');
-        const isFullscreen = (container.node() as HTMLElement).classList.contains('fullscreen-graph');
-        
-        if (isFullscreen) {
-            container.classed('fullscreen-graph', false);
-        } else {
-            container.classed('fullscreen-graph', true);
-        }
-        
-        // Re-render graph with new dimensions
-        if (this.currentGenerations.length > 0) {
-            setTimeout(() => {
-                this.renderGraph(this.currentGenerations);
-            }, 100);
+    // Initialize default view with centered graph
+    private initializeCenteredView() {
+        // Graph is already full screen by default with 10% margins
+        // Center the initial view on the graph
+        const svg = d3.select('#graph');
+        const zoom = (svg.node() as any).__zoom__;
+        if (zoom && this.currentGenerations.length > 0) {
+            // Center on the graph area
+            const width = window.innerWidth;
+            const graphMarginPercent = 0.1;
+            const graphCenterX = width * 0.5; // Center of screen
+            
+            svg.transition().duration(1000).call(
+                zoom.transform as any, 
+                d3.zoomIdentity.translate(0, 0).scale(1)
+            );
         }
     }
 
@@ -696,7 +720,7 @@ class LLMWordGraphExact {
         this.generateLLMOutputs();
     }
 
-    // Network IP detection (exact copy)
+    // Enhanced network IP detection
     private async detectNetworkIP() {
         try {
             const pc = new RTCPeerConnection({
@@ -707,30 +731,33 @@ class LLMWordGraphExact {
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
+            let ipFound = false;
             pc.onicecandidate = (event) => {
-                if (event.candidate) {
+                if (event.candidate && !ipFound) {
                     const candidate = event.candidate.candidate;
                     const ipMatch = candidate.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
                     if (ipMatch && !ipMatch[1].startsWith('127.')) {
                         const localIP = ipMatch[1];
-                        const port = '5173'; // Vite default port
+                        const port = '5173';
                         d3.select('#networkAddress')
-                            .html(`🌍 Network: <code>http://${localIP}:${port}</code>`);
+                            .text(`${localIP}:${port}`);
+                        ipFound = true;
                         pc.close();
                     }
                 }
             };
 
+            // Fallback after 3 seconds
             setTimeout(() => {
-                pc.close();
-                d3.select('#networkAddress')
-                    .html(`🌍 Network: <code>Check network settings</code>`);
-            }, 5000);
+                if (!ipFound) {
+                    pc.close();
+                    d3.select('#networkAddress').text('localhost:5173');
+                }
+            }, 3000);
 
         } catch (error) {
-            console.log('Could not detect local IP automatically');
-            d3.select('#networkAddress')
-                .html(`🌍 Network: <code>Check network settings</code>`);
+            console.log('Could not detect local IP, using localhost');
+            d3.select('#networkAddress').text('localhost:5173');
         }
     }
 
