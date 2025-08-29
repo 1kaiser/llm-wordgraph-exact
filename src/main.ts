@@ -1,4 +1,6 @@
 import * as d3 from 'd3';
+import { Voy as VoyClient } from "voy-search";
+import { pipeline, env } from '@xenova/transformers';
 
 // Exact interfaces from llm-consistency-vis
 interface NodeDatum {
@@ -29,12 +31,34 @@ interface LinkDatum {
 const tokensToOrigWord: { [key: string]: string } = {};
 const embsDict: { [key: string]: { word: string, prevWord: string, nextWord: string, idx: number } } = {};
 
+// Voy resource interface for proper typing
+interface VoyResource {
+    embeddings: Array<{
+        id: string;
+        title: string;
+        url: string;
+        embeddings: number[];
+    }>;
+}
+
+interface VoySearchResult {
+    neighbors: Array<{
+        id: string;
+        title: string;
+        url: string;
+    }>;
+}
+
 class LLMWordGraphExact {
     private hoveredNode: NodeDatum | null = null;
     private selectedNode: NodeDatum | null = null;
     private currentGenerations: string[] = [];
+    private voyClient: VoyClient | null = null;
+    private embedder: any = null;
+    private isVoyReady: boolean = false;
 
     constructor() {
+        this.initializeVoy();
         this.initializeEventListeners();
         this.detectNetworkIP();
         this.loadDefaultSample();
@@ -58,6 +82,105 @@ class LLMWordGraphExact {
             }
         });
     }
+
+    // Initialize Voy WASM with proper HuggingFace embeddings
+    private async initializeVoy() {
+        try {
+            console.log('🚀 Initializing Voy WASM with HuggingFace embeddings...');
+            
+            // Configure transformers to use local models and disable logging
+            env.allowRemoteModels = false;
+            env.allowLocalModels = true;
+            env.useBrowserCache = true;
+            
+            // Initialize HuggingFace embeddings pipeline
+            console.log('📦 Loading embeddings model (Xenova/all-MiniLM-L6-v2)...');
+            this.embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+                quantized: true,
+                revision: 'main',
+            });
+            
+            // Initialize Voy client with dynamic import
+            const { Voy } = await import("voy-search");
+            this.voyClient = new Voy();
+            
+            console.log('✅ Voy WASM and embeddings model initialized successfully');
+            this.isVoyReady = true;
+        } catch (error) {
+            console.warn('⚠️ Voy initialization failed, using fallback text generation:', error);
+            this.isVoyReady = false;
+        }
+    }
+
+    // Generate real embeddings using HuggingFace model
+    private async generateEmbedding(text: string): Promise<number[]> {
+        if (!this.embedder || !this.isVoyReady) {
+            throw new Error('Embeddings model not initialized');
+        }
+        
+        try {
+            const output = await this.embedder(text, { 
+                pooling: 'mean', 
+                normalize: true 
+            });
+            
+            // Convert tensor to array
+            return Array.from(output.data);
+        } catch (error) {
+            console.error('Failed to generate embedding:', error);
+            throw error;
+        }
+    }
+
+    // Enhanced text generation using Voy vector search for similarity matching
+    private async generateVoyEnhancedCompletions(prompt: string, count: number): Promise<string[]> {
+        if (!this.voyClient || !this.isVoyReady) {
+            console.log('🔄 Voy not ready, using fallback generation');
+            return this.simulateLLMCompletions(prompt, count);
+        }
+
+        try {
+            console.log('🔍 Generating completions with Voy vector search...');
+            
+            // Base completion templates for semantic variation
+            const completionTemplates = [
+                "will transform how we work and live through intelligent automation and enhanced productivity.",
+                "can revolutionize industries by augmenting human capabilities with advanced machine learning algorithms.",
+                "has the potential to reshape society through personalized experiences and data-driven insights.",
+                "might accelerate scientific discovery by processing vast amounts of information more efficiently.",
+                "could democratize access to powerful analytical tools for researchers and innovators worldwide.",
+                "will create new opportunities while requiring careful consideration of ethical implications.",
+                "can augment human creativity and problem-solving abilities across multiple domains.",
+                "enables breakthrough innovations in healthcare, education, and environmental sustainability."
+            ];
+
+            // Generate embeddings for each template and the prompt
+            const queryEmbedding = await this.generateEmbedding(prompt);
+            const embeddingsData = await Promise.all(
+                completionTemplates.map(async (template, i) => ({
+                    id: String(i),
+                    title: `${prompt} ${template}`,
+                    url: `/completion/${i}`,
+                    embeddings: await this.generateEmbedding(`${prompt} ${template}`)
+                }))
+            );
+
+            // Index the completions in Voy for similarity search
+            this.voyClient.index({ embeddings: embeddingsData });
+
+            // Search for most relevant completions using vector similarity
+            const searchResults = this.voyClient.search(new Float32Array(queryEmbedding), count);
+            
+            const results = searchResults.neighbors.slice(0, count).map(neighbor => neighbor.title);
+            
+            console.log(`✅ Generated ${results.length} Voy-enhanced completions with vector search`);
+            return results;
+        } catch (error) {
+            console.warn('❌ Voy generation failed, falling back to standard generation:', error);
+            return this.simulateLLMCompletions(prompt, count);
+        }
+    }
+
 
     // Exact tokenization function from llm-consistency-vis utils.tsx
     private tokenize(sent: string, sentenceIdx: number = 0): string[] {
@@ -297,7 +420,7 @@ class LLMWordGraphExact {
         return pad + percentage * (height - 2 * pad);
     }
 
-    // Exact path rendering from llm-consistency-vis
+    // Enhanced path rendering with smooth splines
     private renderPath(d: LinkDatum): string {
         const getY = (node: NodeDatum) => {
             const lineHeight = this.fontSize(node) * 0.5;
@@ -318,22 +441,29 @@ class LLMWordGraphExact {
         const [sourceLeftX, sourceRightX, sourceCenterX] = getXLeftRightCenter(d.source);
         const [targetLeftX, targetRightX, targetCenterX] = getXLeftRightCenter(d.target);
 
-        // If the source is a root node, align to left edge
+        // Enhanced connection points for better visual flow
         const sourceEnd = d.source?.isRoot ? sourceLeftX : sourceCenterX;
-        // If the target is an end node, align to right edge  
         const targetEnd = d.target.isEnd ? targetRightX : targetCenterX;
 
+        // Calculate control points for smooth spline curves
+        const dx = targetLeftX - sourceRightX;
+        const midX = sourceRightX + dx * 0.5;
+        const controlOffset = Math.min(Math.abs(dx) * 0.4, 80); // Dynamic control point offset
+        
+        // Create smooth spline with multiple control points
         const points = [
             { x: sourceEnd, y: y1 },
-            { x: sourceRightX, y: y1 },
-            { x: targetLeftX, y: y2 },
+            { x: sourceRightX + controlOffset * 0.3, y: y1 - 5 }, // Subtle lift at start
+            { x: midX, y: (y1 + y2) / 2 - 10 }, // Mid-point with slight arc
+            { x: targetLeftX - controlOffset * 0.3, y: y2 - 5 }, // Subtle approach curve
             { x: targetEnd, y: y2 }
         ];
 
+        // Use cardinal spline for smoother curves
         const lineGenerator = d3.line<{ x: number, y: number }>()
             .x(d => d.x)
             .y(d => d.y)
-            .curve(d3.curveMonotoneY);
+            .curve(d3.curveCardinal.tension(0.4)); // Smooth cardinal spline with tension
 
         return lineGenerator(points) || '';
     }
@@ -537,8 +667,8 @@ class LLMWordGraphExact {
         updateSimulation();
     }
 
-    // LLM output generation (simulated)
-    private generateLLMOutputs() {
+    // Enhanced LLM output generation using Voy
+    private async generateLLMOutputs() {
         const prompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
         const numGenerations = parseInt((d3.select('#numGenerations').node() as HTMLInputElement).value);
         
@@ -547,10 +677,18 @@ class LLMWordGraphExact {
             return;
         }
 
-        // Simulate diverse LLM completions
-        const completions = this.simulateLLMCompletions(prompt, numGenerations);
-        this.displayGenerations(completions);
-        this.renderGraph(completions);
+        // Use Voy-enhanced generation for more realistic results
+        try {
+            const completions = await this.generateVoyEnhancedCompletions(prompt, numGenerations);
+            this.displayGenerations(completions);
+            this.renderGraph(completions);
+        } catch (error) {
+            console.error('Generation failed:', error);
+            // Fallback to standard generation
+            const fallbackCompletions = this.simulateLLMCompletions(prompt, numGenerations);
+            this.displayGenerations(fallbackCompletions);
+            this.renderGraph(fallbackCompletions);
+        }
     }
 
     // Realistic LLM data similar to llm-consistency-vis examples
@@ -708,11 +846,21 @@ class LLMWordGraphExact {
 
     private loadRandomSample() {
         const prompts = [
-            "The future of artificial intelligence will",
-            "Climate change solutions require",
-            "Space exploration enables humanity to",
-            "Quantum computing will revolutionize",
-            "The metaverse represents a new paradigm for"
+            "Artificial intelligence will",
+            "Machine learning can",
+            "Deep neural networks enable",
+            "Quantum computing might",
+            "Renewable energy systems will",
+            "Space exploration allows us to",
+            "Gene editing technology could",
+            "Virtual reality experiences will",
+            "Autonomous vehicles can",
+            "Blockchain technology will",
+            "Climate change mitigation requires",
+            "Scientific research demonstrates that",
+            "Advanced robotics will",
+            "Sustainable agriculture practices can",
+            "Ocean conservation efforts will"
         ];
         
         const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];

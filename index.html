@@ -33,27 +33,31 @@
             height: 100%;
         }
 
-        /* Draggable UI overlay - top left */
+        /* Draggable UI overlay - top left with enhanced transparency */
         .ui-overlay {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
             z-index: 1000;
             cursor: move;
             min-width: 320px;
             max-width: 400px;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
         }
 
         .ui-overlay:hover {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
             transform: translateY(-2px);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
         }
 
         /* Drag handle - bottom right corner */
@@ -132,34 +136,53 @@
         input[type="text"] {
             flex: 1;
             padding: 10px 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
             font-size: 0.9em;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            cursor: text;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #74b9ff;
-            background: white;
+            border-color: rgba(116, 185, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(116, 185, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
         }
 
         input[type="number"] {
-            width: 60px;
-            padding: 8px 10px;
+            width: 70px;
+            padding: 8px 12px;
             border: 2px solid #e9ecef;
             border-radius: 8px;
             font-size: 0.9em;
             text-align: center;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+            cursor: text;
+            -webkit-appearance: auto;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: inner-spin-button;
+            opacity: 1;
+            cursor: pointer;
         }
 
         input[type="number"]:focus {
             outline: none;
             border-color: #74b9ff;
+            background: rgba(255, 255, 255, 1);
         }
 
         button {
@@ -406,12 +429,12 @@
 
         <div class="control-group">
             <label for="promptInput">LLM Prompt:</label>
-            <input type="text" id="promptInput" placeholder="Enter prompt..." value="Translate Baudelaire poetry">
+            <input type="text" id="promptInput" placeholder="Try: 'Machine learning can' or click Random..." value="Artificial intelligence will">
         </div>
 
         <div class="control-row">
             <label for="numGenerations">Count:</label>
-            <input type="number" id="numGenerations" min="2" max="10" value="5">
+            <input type="number" id="numGenerations" min="2" max="15" value="5">
             <button id="generateBtn">Generate</button>
             <button id="randomBtn">Random</button>
         </div>
@@ -463,23 +486,34 @@
         const dragHandle = document.getElementById('dragHandle');
         
         function makeDraggable() {
-            uiOverlay.addEventListener('mousedown', startDrag);
+            // Only make drag handle draggable, not the entire overlay
             dragHandle.addEventListener('mousedown', startDrag);
             
+            // Prevent dragging when clicking on input elements
+            const inputs = uiOverlay.querySelectorAll('input, button');
+            inputs.forEach(input => {
+                input.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                });
+            });
+            
             function startDrag(e) {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                
-                const rect = uiOverlay.getBoundingClientRect();
-                startLeft = rect.left;
-                startTop = rect.top;
-                
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', stopDrag);
-                
-                uiOverlay.style.transition = 'none';
-                e.preventDefault();
+                // Only start drag if clicking the drag handle
+                if (e.target === dragHandle || dragHandle.contains(e.target)) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    
+                    const rect = uiOverlay.getBoundingClientRect();
+                    startLeft = rect.left;
+                    startTop = rect.top;
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', stopDrag);
+                    
+                    uiOverlay.style.transition = 'none';
+                    e.preventDefault();
+                }
             }
             
             function drag(e) {
