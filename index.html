@@ -13,9 +13,45 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3), transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.2), transparent 50%),
+                linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
             height: 100vh;
             overflow: hidden;
+            position: relative;
+        }
+        
+        /* Grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #fff 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, #fff 0.5px, transparent 0.5px);
+            background-size: 50px 50px, 30px 30px;
+            animation: grain 8s steps(10) infinite;
+        }
+        
+        @keyframes grain {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -10%); }
+            20% { transform: translate(-15%, 5%); }
+            30% { transform: translate(7%, -25%); }
+            40% { transform: translate(-5%, 25%); }
+            50% { transform: translate(-15%, 10%); }
+            60% { transform: translate(15%, 0%); }
+            70% { transform: translate(0%, 15%); }
+            80% { transform: translate(3%, -10%); }
+            90% { transform: translate(-10%, 5%); }
         }
 
         /* Full screen graph container */
@@ -33,31 +69,58 @@
             height: 100%;
         }
 
-        /* Draggable UI overlay - top left with enhanced transparency */
+        /* Dark glassmorphism UI overlay with grain effect */
         .ui-overlay {
             position: fixed;
             top: 20px;
             left: 20px;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(28, 28, 28, 0.7);
+            backdrop-filter: blur(24px) saturate(1.8) brightness(1.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                0 16px 64px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
             z-index: 1000;
             cursor: move;
             min-width: 320px;
             max-width: 400px;
-            transition: all 0.4s ease;
-            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            -webkit-backdrop-filter: blur(24px) saturate(1.8) brightness(1.2);
+            position: relative;
+        }
+        
+        /* Subtle inner grain texture for overlay */
+        .ui-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            pointer-events: none;
+            opacity: 0.02;
+            background-image: 
+                radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+                radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.6) 0.5px, transparent 0.5px);
+            background-size: 60px 60px, 40px 40px;
         }
 
         .ui-overlay:hover {
-            background: rgba(255, 255, 255, 0.85);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+            background: rgba(32, 32, 32, 0.75);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 12px 48px rgba(0, 0, 0, 0.7),
+                0 20px 80px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
             transform: translateY(-2px);
-            backdrop-filter: blur(20px) saturate(200%);
-            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            backdrop-filter: blur(32px) saturate(2.0) brightness(1.25);
+            -webkit-backdrop-filter: blur(32px) saturate(2.0) brightness(1.25);
         }
 
         /* Drag handle - bottom right corner */
@@ -67,21 +130,31 @@
             right: -5px;
             width: 20px;
             height: 20px;
-            background: #667eea;
-            border: 1px solid #5a6fd8;
-            border-radius: 4px;
+            background: rgba(120, 119, 198, 0.35);
+            border: none;
+            border-radius: 6px;
             cursor: nw-resize;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: rgba(255, 255, 255, 0.8);
             font-size: 12px;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px) brightness(1.05);
+            -webkit-backdrop-filter: blur(15px) brightness(1.05);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 2px 6px rgba(120, 119, 198, 0.2);
         }
 
         .drag-handle:hover {
-            background: #5a6fd8;
-            border-color: #4c63d2;
+            background: rgba(120, 119, 198, 0.45);
+            color: white;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 3px 8px rgba(120, 119, 198, 0.3);
         }
 
         .drag-handle::before {
@@ -89,6 +162,7 @@
             transform: rotate(45deg);
             font-size: 8px;
             line-height: 1;
+            opacity: 0.8;
         }
 
         /* UI Header */
@@ -99,24 +173,28 @@
 
         .ui-header h1 {
             font-size: 1.4em;
-            color: #2d3436;
+            color: rgba(255, 255, 255, 0.95);
             margin-bottom: 5px;
             font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .ui-header p {
             font-size: 0.9em;
-            color: #636e72;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 10px;
         }
 
         .network-info {
             font-size: 0.8em;
-            color: #74b9ff;
-            background: rgba(116, 185, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 8px;
+            color: rgba(120, 219, 255, 0.9);
+            background: rgba(120, 219, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 6px 12px;
+            border-radius: 12px;
             margin-bottom: 15px;
+            border: 1px solid rgba(120, 219, 255, 0.2);
         }
 
         /* Form controls */
@@ -127,9 +205,10 @@
         .control-group label {
             display: block;
             font-weight: 600;
-            color: #2d3436;
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 5px;
             font-size: 0.9em;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .control-row {
@@ -141,39 +220,60 @@
 
         input[type="text"] {
             flex: 1;
-            padding: 8px 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             font-size: 0.9em;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(40, 40, 40, 0.6);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
             cursor: text;
             user-select: text;
             -webkit-user-select: text;
             -moz-user-select: text;
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #667eea;
-            background: rgba(255, 255, 255, 1);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            border-color: rgba(120, 119, 198, 0.6);
+            background: rgba(45, 45, 45, 0.7);
+            backdrop-filter: blur(24px) saturate(1.6);
+            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 0 0 2px rgba(120, 119, 198, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         input[type="number"] {
             width: 70px;
             padding: 6px 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             font-size: 0.9em;
             text-align: center;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(40, 40, 40, 0.6);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
             cursor: text;
             -webkit-appearance: auto;
             -moz-appearance: textfield;
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         input[type="number"]::-webkit-outer-spin-button,
@@ -185,31 +285,56 @@
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #667eea;
-            background: rgba(255, 255, 255, 1);
+            border-color: rgba(120, 119, 198, 0.6);
+            background: rgba(45, 45, 45, 0.7);
+            backdrop-filter: blur(24px) saturate(1.6);
+            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 0 0 2px rgba(120, 119, 198, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         button {
-            background: #667eea;
-            color: white;
-            border: 1px solid #5a6fd8;
+            background: rgba(120, 119, 198, 0.3);
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 500;
             font-size: 0.9em;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            backdrop-filter: blur(20px) saturate(1.5) brightness(1.1);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5) brightness(1.1);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 4px 12px rgba(120, 119, 198, 0.2),
+                0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         button:hover {
-            background: #5a6fd8;
-            border-color: #4c63d2;
+            background: rgba(120, 119, 198, 0.4);
+            color: white;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 6px 16px rgba(120, 119, 198, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
         }
 
         button:active {
-            background: #4c63d2;
-            transform: translateY(1px);
+            background: rgba(120, 119, 198, 0.5);
+            transform: translateY(0px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 3px 8px rgba(120, 119, 198, 0.4),
+                0 2px 6px rgba(0, 0, 0, 0.5);
         }
 
         .button-group {
@@ -280,30 +405,45 @@
             position: absolute;
             top: -5px;
             right: -5px;
-            background: #667eea;
-            color: white;
-            border: 1px solid #5a6fd8;
+            background: rgba(120, 119, 198, 0.4);
+            color: rgba(255, 255, 255, 0.95);
+            border: none;
             width: 25px;
             height: 25px;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
             font-weight: bold;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             z-index: 1001;
+            backdrop-filter: blur(15px) brightness(1.1);
+            -webkit-backdrop-filter: blur(15px) brightness(1.1);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 2px 8px rgba(120, 119, 198, 0.3);
         }
         
         .collapse-toggle:hover {
-            background: #5a6fd8;
-            border-color: #4c63d2;
+            background: rgba(120, 119, 198, 0.5);
+            color: white;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+                0 4px 12px rgba(120, 119, 198, 0.4);
+            transform: translateY(-1px);
         }
         
         .collapse-toggle:active {
-            background: #4c63d2;
-            transform: translateY(1px);
+            background: rgba(120, 119, 198, 0.6);
+            transform: translateY(0px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 2px 6px rgba(120, 119, 198, 0.5);
         }
         
         /* Essential controls - always visible when collapsed */
