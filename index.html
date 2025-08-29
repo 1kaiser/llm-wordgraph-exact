@@ -67,15 +67,21 @@
             right: -5px;
             width: 20px;
             height: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
+            background: #667eea;
+            border: 1px solid #5a6fd8;
+            border-radius: 4px;
             cursor: nw-resize;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 12px;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .drag-handle:hover {
+            background: #5a6fd8;
+            border-color: #4c63d2;
         }
 
         .drag-handle::before {
@@ -186,21 +192,26 @@
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #667eea;
             color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 10px;
+            border: 1px solid #5a6fd8;
+            padding: 8px 12px;
+            border-radius: 4px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 0.9em;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            background: #5a6fd8;
+            border-color: #4c63d2;
+        }
+
+        button:active {
+            background: #4c63d2;
+            transform: translateY(1px);
         }
 
         .button-group {
@@ -247,6 +258,73 @@
 
         .generations-section.open {
             max-height: 300px;
+        }
+
+        /* Main UI collapse functionality */
+        .ui-overlay.collapsed {
+            min-width: 320px;
+            max-width: 320px;
+        }
+        
+        .ui-collapsible {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.6s ease, opacity 0.4s ease;
+            opacity: 1;
+        }
+        
+        .ui-overlay.collapsed .ui-collapsible {
+            max-height: 0;
+            opacity: 0;
+        }
+        
+        .collapse-toggle {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #667eea;
+            color: white;
+            border: 1px solid #5a6fd8;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            z-index: 1001;
+        }
+        
+        .collapse-toggle:hover {
+            background: #5a6fd8;
+            border-color: #4c63d2;
+        }
+        
+        .collapse-toggle:active {
+            background: #4c63d2;
+            transform: translateY(1px);
+        }
+        
+        /* Essential controls - always visible when collapsed */
+        .essential-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .compact-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .compact-input {
+            flex: 1;
+            min-width: 120px;
         }
 
         .generations-header {
@@ -367,10 +445,10 @@
         }
 
         .zoom-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             color: #495057;
@@ -378,16 +456,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
         }
 
         .zoom-btn:hover {
             background: white;
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .zoom-btn:active {
+            background: #f5f5f5;
+            transform: translateY(1px);
         }
 
         /* Responsive adjustments */
@@ -418,30 +500,34 @@
     <!-- Draggable UI overlay -->
     <div class="ui-overlay" id="uiOverlay">
         <div class="drag-handle" id="dragHandle"></div>
+        <button class="collapse-toggle" id="collapseToggle">−</button>
         
-        <div class="ui-header">
-            <h1>🧠 LLM Word Graph</h1>
-            <p>Exact visualization of language patterns</p>
-            <div class="network-info" id="networkInfo">
-                🌐 <span id="networkAddress">Loading...</span>
+        <!-- Essential controls - always visible -->
+        <div class="essential-controls">
+            <div class="compact-row">
+                <input type="text" id="promptInput" class="compact-input" placeholder="AI prompt..." value="Artificial intelligence will">
+                <input type="number" id="numGenerations" min="2" max="15" value="5" style="width: 50px;">
+            </div>
+            <div class="compact-row">
+                <button id="generateBtn" style="flex: 1;">▶</button>
+                <button id="randomBtn">🎲</button>
+                <span id="timingDisplay" style="font-size: 0.8em; color: #74b9ff; min-width: 60px;"></span>
             </div>
         </div>
+        
+        <!-- Collapsible content -->
+        <div class="ui-collapsible" id="uiCollapsible">
+            <div class="ui-header">
+                <h1>🧠 LLM Word Graph</h1>
+                <p>Exact visualization of language patterns</p>
+                <div class="network-info" id="networkInfo">
+                    🌐 <span id="networkAddress">Loading...</span>
+                </div>
+            </div>
 
-        <div class="control-group">
-            <label for="promptInput">LLM Prompt:</label>
-            <input type="text" id="promptInput" placeholder="Try: 'Machine learning can' or click Random..." value="Artificial intelligence will">
-        </div>
-
-        <div class="control-row">
-            <label for="numGenerations">Count:</label>
-            <input type="number" id="numGenerations" min="2" max="15" value="5">
-            <button id="generateBtn">Generate</button>
-            <button id="randomBtn">Random</button>
-        </div>
-
-        <div class="button-group">
-            <button id="testBtn">Run Tests</button>
-        </div>
+            <div class="button-group">
+                <button id="testBtn">Run Tests</button>
+            </div>
 
         <div class="stats">
             <div class="stat">
@@ -458,13 +544,14 @@
             </div>
         </div>
 
-        <!-- Collapsible generations list -->
-        <div class="generations-section" id="generationsSection">
-            <div class="generations-header" onclick="toggleGenerationsList()">
-                <h3>Generated Outputs <span id="totalCount">(0)</span></h3>
-                <span class="toggle-icon">▼</span>
+            <!-- Collapsible generations list -->
+            <div class="generations-section" id="generationsSection">
+                <div class="generations-header" onclick="toggleGenerationsList()">
+                    <h3>Generated Outputs <span id="totalCount">(0)</span></h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="generations-list" id="generationsList"></div>
             </div>
-            <div class="generations-list" id="generationsList"></div>
         </div>
     </div>
 
@@ -552,9 +639,28 @@
             section.classList.toggle('open');
         }
         
+        function toggleUICollapse() {
+            const overlay = document.getElementById('uiOverlay');
+            const toggle = document.getElementById('collapseToggle');
+            
+            overlay.classList.toggle('collapsed');
+            
+            if (overlay.classList.contains('collapsed')) {
+                toggle.textContent = '+';
+                toggle.title = 'Expand controls';
+            } else {
+                toggle.textContent = '−';
+                toggle.title = 'Collapse controls';
+            }
+        }
+        
         // Initialize draggable functionality
         window.addEventListener('load', () => {
             makeDraggable();
+            
+            // Add collapse toggle functionality
+            const collapseToggle = document.getElementById('collapseToggle');
+            collapseToggle.addEventListener('click', toggleUICollapse);
         });
     </script>
 </body>

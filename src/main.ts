@@ -56,6 +56,9 @@ class LLMWordGraphExact {
     private voyClient: VoyClient | null = null;
     private embedder: any = null;
     private isVoyReady: boolean = false;
+    private isGenerating: boolean = false;
+    private lastPrompt: string = "";
+    private generationStartTime: number = 0;
 
     constructor() {
         this.initializeVoy();
@@ -66,9 +69,20 @@ class LLMWordGraphExact {
 
     private initializeEventListeners() {
         // Generation controls
-        d3.select('#generateBtn').on('click', () => this.generateLLMOutputs());
+        d3.select('#generateBtn').on('click', () => this.handleGenerateClick());
         d3.select('#randomBtn').on('click', () => this.loadRandomSample());
         d3.select('#testBtn').on('click', () => this.runComparisonTests());
+        
+        // Input monitoring for button state changes
+        d3.select('#promptInput').on('input', () => this.updateButtonState());
+        d3.select('#promptInput').on('keydown', (event) => {
+            if (event.key === 'Enter') {
+                this.handleGenerateClick();
+            }
+        });
+        
+        // Initialize button state
+        this.updateButtonState();
         
         // Zoom controls
         d3.select('#zoomIn').on('click', () => this.zoom(1.5));
@@ -665,8 +679,139 @@ class LLMWordGraphExact {
         };
 
         updateSimulation();
+        
+        // Auto-reset zoom like pressing home button, then center the graph
+        setTimeout(() => {
+            this.resetZoom();
+            // Small delay to let reset complete, then center using center of gravity
+            setTimeout(() => {
+                this.centerGraphView();
+            }, 200);
+        }, 100);
     }
 
+    // Center the graph view using center of gravity with proper scaling
+    private centerGraphView() {
+        const svg = d3.select("#graph");
+        const container = svg.select("g");
+        const nodes = container.selectAll(".node");
+        const zoom = (svg.node() as any).__zoom__;
+        
+        if (!zoom || nodes.empty()) {
+            return;
+        }
+        
+        // Screen dimensions and target area (with 10% margins)
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const screenCenterX = screenWidth / 2;
+        const screenCenterY = screenHeight / 2;
+        
+        // Calculate available graph area (80% of screen width)
+        const marginPercent = 0.1;
+        const availableWidth = screenWidth * (1 - 2 * marginPercent);
+        
+        // Step 1: Calculate center of gravity (weighted by node importance)
+        let totalWeightedX = 0;
+        let totalWeightedY = 0;
+        let totalWeight = 0;
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        
+        nodes.each(function(d: any) {
+            if (d.x !== undefined && d.y !== undefined) {
+                // Use node count as weight (more important nodes have higher count)
+                const weight = d.count || 1;
+                
+                totalWeightedX += d.x * weight;
+                totalWeightedY += d.y * weight;
+                totalWeight += weight;
+                
+                // Track bounds for scaling
+                minX = Math.min(minX, d.x);
+                maxX = Math.max(maxX, d.x);
+                minY = Math.min(minY, d.y);
+                maxY = Math.max(maxY, d.y);
+            }
+        });
+        
+        if (totalWeight === 0) return;
+        
+        // Center of gravity (weighted center)
+        const centerOfGravityX = totalWeightedX / totalWeight;
+        const centerOfGravityY = totalWeightedY / totalWeight;
+        
+        // Step 2: Calculate current graph dimensions
+        const currentGraphWidth = maxX - minX;
+        const currentGraphHeight = maxY - minY;
+        
+        // Step 3: Calculate scale to fit graph within 80% of screen width
+        let scale = 1;
+        if (currentGraphWidth > 0) {
+            scale = Math.min(availableWidth / currentGraphWidth, 2.0); // Cap at 2x zoom
+            scale = Math.max(scale, 0.2); // Minimum 0.2x zoom
+        }
+        
+        // Step 4: Calculate translation to center the graph's center of gravity
+        const translateX = screenCenterX - (centerOfGravityX * scale);
+        const translateY = screenCenterY - (centerOfGravityY * scale);
+        
+        // Step 5: Apply smooth transition with proper scaling and centering
+        svg.transition()
+            .duration(750)
+            .ease(d3.easeQuadOut)
+            .call(
+                zoom.transform,
+                d3.zoomIdentity.translate(translateX, translateY).scale(scale)
+            );
+            
+        console.log(`🎯 Center of gravity (${centerOfGravityX.toFixed(1)}, ${centerOfGravityY.toFixed(1)}) centered at screen (${screenCenterX}, ${screenCenterY}) with scale ${scale.toFixed(2)}`);
+        console.log(`📏 Graph dimensions: ${currentGraphWidth.toFixed(1)}x${currentGraphHeight.toFixed(1)} → scaled to fit ${availableWidth.toFixed(1)}px width`);
+    }
+
+    // Handle generate button click with smart state management
+    private handleGenerateClick() {
+        const currentPrompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
+        
+        if (this.isGenerating) {
+            return; // Prevent multiple simultaneous generations
+        }
+        
+        if (currentPrompt === this.lastPrompt && this.currentGenerations.length > 0) {
+            // Same prompt - act as refresh (load random)
+            this.loadRandomSample();
+        } else {
+            // New prompt - generate
+            this.generateLLMOutputs();
+        }
+    }
+    
+    // Update button appearance based on current state
+    private updateButtonState() {
+        const generateBtn = d3.select('#generateBtn');
+        const currentPrompt = (d3.select('#promptInput').node() as HTMLInputElement).value.trim();
+        
+        if (this.isGenerating) {
+            // Generating state - show loading
+            generateBtn.html('⏳');
+            return;
+        }
+        
+        if (!currentPrompt) {
+            // Empty prompt
+            generateBtn.html('📝');
+            return;
+        }
+        
+        if (currentPrompt === this.lastPrompt && this.currentGenerations.length > 0) {
+            // Same prompt as last generation - show refresh
+            generateBtn.html('🔄');
+        } else {
+            // New prompt - show play
+            generateBtn.html('▶');
+        }
+    }
+    
     // Enhanced LLM output generation using Voy
     private async generateLLMOutputs() {
         const prompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
@@ -677,17 +822,44 @@ class LLMWordGraphExact {
             return;
         }
 
-        // Use Voy-enhanced generation for more realistic results
+        // Start generation timing and UI state
+        this.isGenerating = true;
+        this.generationStartTime = performance.now();
+        this.lastPrompt = prompt;
+        this.updateButtonState();
+        
+        // Clear previous timing display
+        d3.select('#timingDisplay').text('');
+
         try {
+            // Use Voy-enhanced generation for more realistic results
             const completions = await this.generateVoyEnhancedCompletions(prompt, numGenerations);
+            
+            // Calculate generation time
+            const generationTime = ((performance.now() - this.generationStartTime) / 1000).toFixed(2);
+            
+            // Update UI with results
             this.displayGenerations(completions);
             this.renderGraph(completions);
+            
+            // Show timing information
+            d3.select('#timingDisplay').text(`${generationTime}s`);
+            
+            console.log(`⚡ Generated ${completions.length} completions in ${generationTime}s`);
         } catch (error) {
             console.error('Generation failed:', error);
             // Fallback to standard generation
             const fallbackCompletions = this.simulateLLMCompletions(prompt, numGenerations);
+            
+            const generationTime = ((performance.now() - this.generationStartTime) / 1000).toFixed(2);
             this.displayGenerations(fallbackCompletions);
             this.renderGraph(fallbackCompletions);
+            
+            d3.select('#timingDisplay').text(`${generationTime}s (fallback)`);
+        } finally {
+            // Reset generation state
+            this.isGenerating = false;
+            this.updateButtonState();
         }
     }
 
@@ -865,6 +1037,7 @@ class LLMWordGraphExact {
         
         const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
         (d3.select('#promptInput').node() as HTMLInputElement).value = randomPrompt;
+        this.updateButtonState(); // Update button appearance for new prompt
         this.generateLLMOutputs();
     }
 
