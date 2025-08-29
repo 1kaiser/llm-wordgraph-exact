@@ -199,9 +199,20 @@
 
         .graph-container {
             position: relative;
-            height: 600px;
+            height: calc(100vh - 400px);
+            min-height: 600px;
             overflow: hidden;
             background: radial-gradient(circle at center, #ffffff 0%, #f8f9fa 100%);
+        }
+        
+        .fullscreen-graph {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999;
+            background: white;
         }
 
         #graph {
@@ -288,7 +299,7 @@
         <div class="controls">
             <div class="input-group">
                 <label for="promptInput">LLM Prompt:</label>
-                <input type="text" id="promptInput" placeholder="Enter a prompt for LLM completions..." value="The future of artificial intelligence will">
+                <input type="text" id="promptInput" placeholder="Enter a prompt for LLM completions..." value="Translate this to English: Baudelaire poetry">
             </div>
             
             <div class="input-group">
@@ -326,6 +337,7 @@
                 <button class="zoom-btn" id="zoomIn" title="Zoom In">+</button>
                 <button class="zoom-btn" id="zoomOut" title="Zoom Out">−</button>
                 <button class="zoom-btn" id="resetZoom" title="Reset Zoom">⌂</button>
+                <button class="zoom-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
             </div>
         </div>
     </div>

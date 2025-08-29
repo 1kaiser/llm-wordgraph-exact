@@ -49,6 +49,7 @@ class LLMWordGraphExact {
         d3.select('#zoomIn').on('click', () => this.zoom(1.5));
         d3.select('#zoomOut').on('click', () => this.zoom(1/1.5));
         d3.select('#resetZoom').on('click', () => this.resetZoom());
+        d3.select('#fullscreenBtn').on('click', () => this.toggleFullscreen());
 
         // Window resize
         window.addEventListener('resize', () => {
@@ -385,8 +386,11 @@ class LLMWordGraphExact {
         d3.select('#linkCount').text(linksData.length);
         d3.select('#genCount').text(generations.length);
 
-        const width = Math.min(window.innerWidth * 0.95, 5000);
-        const height = Math.min(window.innerHeight * 0.6, 800);
+        // Use full screen dimensions for better visualization
+        const container = d3.select('.graph-container').node() as HTMLElement;
+        const isFullscreen = container.classList.contains('fullscreen-graph');
+        const width = isFullscreen ? window.innerWidth : Math.min(window.innerWidth * 0.95, 5000);
+        const height = isFullscreen ? window.innerHeight : container.getBoundingClientRect().height;
         
         const svg = d3.select("#graph")
             .html('')
@@ -536,32 +540,67 @@ class LLMWordGraphExact {
         this.renderGraph(completions);
     }
 
+    // Realistic LLM data similar to llm-consistency-vis examples
+    private getRealisticLLMSample(): string[] {
+        // Based on real translation variations from their examples
+        return [
+            'In the days when Nature in her powerful creativity conceived monstrous children every day, I would have loved to live near a young giantess, like a voluptuous cat at the feet of a queen.',
+            'In the days when Nature in her powerful creativity conceived monstrous children every day, I would have loved to live beside a young giantess, like a voluptuous cat at the feet of a queen.',
+            'In the days when Nature in her powerful mood conceived monstrous children every day, I would have loved to live with a young giantess, like a voluptuous cat at the feet of a queen.',
+            'In the time when Nature in her powerful mood conceived monstrous children every day, I would have loved to live near a young giantess, like a voluptuous cat at the feet of a queen.',
+            'In the days when Nature in her powerful fervor conceived monstrous children every day, I would have loved to live with a young giantess, like a voluptuous cat at the feet of a queen.',
+            'When Nature in her powerful mood was conceiving monstrous children every day, I would have loved to live beside a young giantess, like a voluptuous cat at the feet of a queen.',
+            'In the days when Nature in her powerful verve conceived monstrous children each day, I would have loved to live beside a young giantess, like a voluptuous cat at the feet of a queen.'
+        ];
+    }
+
     private simulateLLMCompletions(prompt: string, count: number): string[] {
+        // Use realistic variations similar to actual LLM outputs
+        const realisticExamples = {
+            'The future of artificial intelligence will': [
+                'The future of artificial intelligence will transform how we work and live in unprecedented ways.',
+                'The future of artificial intelligence will revolutionize industries through automation and intelligent systems.',
+                'The future of artificial intelligence will reshape society by enhancing human capabilities and decision-making.',
+                'The future of artificial intelligence will accelerate scientific discovery and innovation across all fields.',
+                'The future of artificial intelligence will democratize access to powerful tools and knowledge.',
+                'The future of artificial intelligence will create new opportunities while requiring careful ethical consideration.',
+                'The future of artificial intelligence will augment human creativity and problem-solving abilities.',
+                'The future of artificial intelligence will enable personalized experiences tailored to individual needs.'
+            ],
+            'Climate change solutions require': [
+                'Climate change solutions require immediate global cooperation and coordinated action.',
+                'Climate change solutions require innovative technologies and sustainable practices.',
+                'Climate change solutions require significant investment in renewable energy sources.',
+                'Climate change solutions require fundamental changes in how we produce and consume.',
+                'Climate change solutions require both technological innovation and behavioral shifts.',
+                'Climate change solutions require unprecedented international collaboration and commitment.',
+                'Climate change solutions require comprehensive policies that address all sectors of society.',
+                'Climate change solutions require urgent action from governments, businesses, and individuals.'
+            ]
+        };
+
+        // Use realistic examples if available, otherwise generate variations
+        const baseExamples = realisticExamples[prompt as keyof typeof realisticExamples];
+        if (baseExamples) {
+            return baseExamples.slice(0, count);
+        }
+
+        // Fallback to synthetic variations
         const continuations = [
-            "revolutionize industries through automation and intelligent decision-making systems that enhance human capabilities.",
-            "transform education by providing personalized learning experiences tailored to individual student needs and learning styles.",
-            "reshape healthcare with predictive analytics and precision medicine that improves patient outcomes significantly.",
-            "enhance creative industries by augmenting human creativity with powerful generative tools and collaborative AI systems.",
-            "improve environmental sustainability through smart resource management and optimization of energy consumption patterns.",
-            "democratize knowledge by making advanced analytical tools accessible to researchers and innovators worldwide.",
-            "accelerate scientific discovery through automated hypothesis generation and experimental design optimization systems.",
-            "transform transportation with autonomous vehicles and intelligent traffic management systems for safer and more efficient travel.",
-            "revolutionize communication by enabling seamless real-time translation and cross-cultural understanding.",
-            "enhance decision-making processes by providing data-driven insights and predictive modeling capabilities."
+            "revolutionize industries through automation and intelligent decision-making systems.",
+            "transform education by providing personalized learning experiences for students.",
+            "reshape healthcare with predictive analytics and precision medicine approaches.",
+            "enhance creative industries through powerful generative tools and AI collaboration.",
+            "improve environmental sustainability via smart resource management systems.",
+            "democratize knowledge by making advanced analytical tools accessible worldwide.",
+            "accelerate scientific discovery through automated hypothesis generation and testing.",
+            "transform transportation with autonomous vehicles and intelligent traffic systems."
         ];
 
         const results: string[] = [];
         for (let i = 0; i < count; i++) {
             const continuation = continuations[i % continuations.length];
-            // Add slight variations to simulate real LLM diversity
-            const variation = Math.random() > 0.5 ? 
-                continuation : 
-                continuation.replace(/\b(through|with|by)\b/g, match => {
-                    const alternatives: any = { 'through': 'via', 'with': 'using', 'by': 'through' };
-                    return alternatives[match] || match;
-                });
-            
-            results.push(`${prompt} ${variation}`);
+            results.push(`${prompt} ${continuation}`);
         }
         
         return results;
@@ -616,14 +655,31 @@ class LLMWordGraphExact {
         }
     }
 
-    // Sample data
-    private loadDefaultSample() {
-        const prompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
-        if (prompt) {
-            const generations = this.simulateLLMCompletions(prompt, 3);
-            this.displayGenerations(generations);
-            this.renderGraph(generations);
+    // Fullscreen toggle
+    private toggleFullscreen() {
+        const container = d3.select('.graph-container');
+        const isFullscreen = (container.node() as HTMLElement).classList.contains('fullscreen-graph');
+        
+        if (isFullscreen) {
+            container.classed('fullscreen-graph', false);
+        } else {
+            container.classed('fullscreen-graph', true);
         }
+        
+        // Re-render graph with new dimensions
+        if (this.currentGenerations.length > 0) {
+            setTimeout(() => {
+                this.renderGraph(this.currentGenerations);
+            }, 100);
+        }
+    }
+
+    // Sample data - using realistic LLM variations similar to llm-consistency-vis
+    private loadDefaultSample() {
+        // Use one of the realistic examples
+        const realisticGenerations = this.getRealisticLLMSample();
+        this.displayGenerations(realisticGenerations);
+        this.renderGraph(realisticGenerations);
     }
 
     private loadRandomSample() {
@@ -677,9 +733,76 @@ class LLMWordGraphExact {
                 .html(`🌍 Network: <code>Check network settings</code>`);
         }
     }
+
+    // Test suite for comparing with llm-consistency-vis
+    public runComparisonTests() {
+        console.log('🧪 Running comparison tests with llm-consistency-vis...');
+        
+        const testGenerations = this.getRealisticLLMSample().slice(0, 3);
+        console.log('📝 Test input:', testGenerations);
+        
+        // Test tokenization
+        console.log('\n🔤 Testing tokenization:');
+        testGenerations.forEach((gen, i) => {
+            const tokens = this.tokenize(gen, i);
+            console.log(`Generation ${i+1}: ${tokens.length} tokens`);
+            console.log(`  First 5 tokens:`, tokens.slice(0, 5).map(t => tokensToOrigWord[t] || t));
+        });
+
+        // Test graph generation
+        console.log('\n📊 Testing graph generation:');
+        const { nodesData, linksData } = this.createGraphDataFromGenerations(testGenerations);
+        console.log(`Generated ${nodesData.length} nodes, ${linksData.length} links`);
+        
+        // Test word similarity and merging
+        console.log('\n🔗 Testing word similarity:');
+        const uniqueWords = new Set<string>();
+        nodesData.forEach(node => {
+            const originalWord = tokensToOrigWord[node.word] || node.word;
+            uniqueWords.add(originalWord);
+        });
+        console.log(`Unique words after similarity merging: ${uniqueWords.size}`);
+        console.log('Sample words:', Array.from(uniqueWords).slice(0, 10));
+
+        // Test positioning
+        console.log('\n📍 Testing positioning algorithm:');
+        this.addBoundingBoxData(nodesData);
+        nodesData.forEach((node, i) => {
+            if (i < 5) { // Show first 5 nodes
+                const x = this.getExpectedX(node);
+                const y = this.getExpectedY(node, 600);
+                const word = tokensToOrigWord[node.word] || node.word;
+                console.log(`"${word}": x=${Math.round(x)}, y=${Math.round(y)}, parents=${node.parents.length}, children=${node.children.length}`);
+            }
+        });
+
+        return {
+            totalNodes: nodesData.length,
+            totalLinks: linksData.length,
+            uniqueWords: uniqueWords.size,
+            sampleNode: {
+                word: tokensToOrigWord[nodesData[0]?.word] || nodesData[0]?.word,
+                x: Math.round(this.getExpectedX(nodesData[0])),
+                y: Math.round(this.getExpectedY(nodesData[0], 600)),
+                parents: nodesData[0]?.parents.length || 0,
+                children: nodesData[0]?.children.length || 0
+            }
+        };
+    }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new LLMWordGraphExact();
+    const app = new LLMWordGraphExact();
+    
+    // Add test button to run comparison
+    const controls = document.querySelector('.controls');
+    const testBtn = document.createElement('button');
+    testBtn.textContent = 'Run Comparison Tests';
+    testBtn.style.backgroundColor = '#28a745';
+    testBtn.onclick = () => {
+        const results = app.runComparisonTests();
+        alert(`Test Results:\n• Nodes: ${results.totalNodes}\n• Links: ${results.totalLinks}\n• Unique Words: ${results.uniqueWords}\n• Sample Node: ${results.sampleNode.word} at (${results.sampleNode.x}, ${results.sampleNode.y})`);
+    };
+    controls?.appendChild(testBtn);
 });

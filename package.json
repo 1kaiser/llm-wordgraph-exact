@@ -9,7 +9,13 @@
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["llm", "visualization", "word-graph", "d3", "typescript"],
+  "keywords": [
+    "llm",
+    "visualization",
+    "word-graph",
+    "d3",
+    "typescript"
+  ],
   "author": "1kaiser <1kaiser@users.noreply.github.com>",
   "license": "MIT",
   "devDependencies": {
@@ -17,6 +23,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "d3": "^7.8.5"
+    "d3": "^7.8.5",
+    "voy-search": "^0.6.3"
   }
 }
