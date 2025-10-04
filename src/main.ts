@@ -72,7 +72,7 @@ class LLMWordGraphExact {
         d3.select('#generateBtn').on('click', () => this.handleGenerateClick());
         d3.select('#randomBtn').on('click', () => this.loadRandomSample());
         d3.select('#testBtn').on('click', () => this.runComparisonTests());
-        
+
         // Input monitoring for button state changes
         d3.select('#promptInput').on('input', () => this.updateButtonState());
         d3.select('#promptInput').on('keydown', (event) => {
@@ -80,14 +80,17 @@ class LLMWordGraphExact {
                 this.handleGenerateClick();
             }
         });
-        
+
         // Initialize button state
         this.updateButtonState();
-        
+
         // Zoom controls
         d3.select('#zoomIn').on('click', () => this.zoom(1.5));
         d3.select('#zoomOut').on('click', () => this.zoom(1/1.5));
         d3.select('#resetZoom').on('click', () => this.resetZoom());
+
+        // Make control panel draggable
+        this.initializeDraggablePanel();
 
         // Window resize
         window.addEventListener('resize', () => {
@@ -95,6 +98,55 @@ class LLMWordGraphExact {
                 this.renderGraph(this.currentGenerations);
             }
         });
+    }
+
+    // Make control panel draggable using D3.js
+    private initializeDraggablePanel() {
+        const panel = d3.select('.control-panel');
+        const header = d3.select('.panel-header');
+
+        // Add cursor style to indicate draggable area
+        header.style('cursor', 'move');
+
+        // Create drag behavior
+        const drag = d3.drag<HTMLDivElement, unknown>()
+            .on('start', function(event) {
+                // Bring panel to front
+                d3.select(this.parentElement as HTMLElement).style('z-index', '1001');
+                // Change cursor
+                header.style('cursor', 'grabbing');
+            })
+            .on('drag', function(event) {
+                const panel = d3.select(this.parentElement as HTMLElement);
+
+                // Get current position
+                const currentLeft = parseInt(panel.style('left')) || 20;
+                const currentTop = parseInt(panel.style('top')) || 20;
+
+                // Calculate new position
+                const newLeft = currentLeft + event.dx;
+                const newTop = currentTop + event.dy;
+
+                // Apply constraints to keep panel on screen
+                const panelWidth = (this.parentElement as HTMLElement).offsetWidth;
+                const panelHeight = (this.parentElement as HTMLElement).offsetHeight;
+                const maxLeft = window.innerWidth - panelWidth;
+                const maxTop = window.innerHeight - panelHeight;
+
+                const constrainedLeft = Math.max(0, Math.min(newLeft, maxLeft));
+                const constrainedTop = Math.max(0, Math.min(newTop, maxTop));
+
+                // Update position
+                panel.style('left', constrainedLeft + 'px');
+                panel.style('top', constrainedTop + 'px');
+            })
+            .on('end', function() {
+                // Restore cursor
+                header.style('cursor', 'move');
+            });
+
+        // Apply drag behavior to header only
+        header.call(drag as any);
     }
 
     // Initialize Voy WASM with proper HuggingFace embeddings
