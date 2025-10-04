@@ -64,7 +64,7 @@ class LLMWordGraphExact {
         this.initializeVoy();
         this.initializeEventListeners();
         this.detectNetworkIP();
-        this.loadDefaultSample();
+        // No default sample - wait for Gemma to be ready
     }
 
     private initializeEventListeners() {
@@ -771,54 +771,56 @@ class LLMWordGraphExact {
 
     // Handle generate button click with smart state management
     private handleGenerateClick() {
-        const currentPrompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
-        
         if (this.isGenerating) {
             return; // Prevent multiple simultaneous generations
         }
-        
-        if (currentPrompt === this.lastPrompt && this.currentGenerations.length > 0) {
-            // Same prompt - act as refresh (load random)
-            this.loadRandomSample();
-        } else {
-            // New prompt - generate
-            this.generateLLMOutputs();
-        }
+
+        // Always generate with Gemma AI
+        this.generateLLMOutputs();
     }
     
     // Update button appearance based on current state
     private updateButtonState() {
         const generateBtn = d3.select('#generateBtn');
         const currentPrompt = (d3.select('#promptInput').node() as HTMLInputElement).value.trim();
-        
+
         if (this.isGenerating) {
             // Generating state - show loading
             generateBtn.html('⏳');
+            generateBtn.property('disabled', true);
             return;
         }
-        
-        if (!currentPrompt) {
-            // Empty prompt
-            generateBtn.html('📝');
+
+        // Check if Gemma is ready
+        const gemmaGenerator = (window as any).gemmaGenerator;
+        const isGemmaReady = gemmaGenerator && gemmaGenerator.isReady;
+
+        if (!isGemmaReady) {
+            generateBtn.html('⏸');
+            generateBtn.property('disabled', true);
             return;
         }
-        
-        if (currentPrompt === this.lastPrompt && this.currentGenerations.length > 0) {
-            // Same prompt as last generation - show refresh
-            generateBtn.html('🔄');
-        } else {
-            // New prompt - show play
-            generateBtn.html('▶');
-        }
+
+        // Ready to generate
+        generateBtn.html('Generate');
+        generateBtn.property('disabled', !currentPrompt);
     }
     
     // Enhanced LLM output generation using Voy
     private async generateLLMOutputs() {
         const prompt = (d3.select('#promptInput').node() as HTMLInputElement).value;
         const numGenerations = parseInt((d3.select('#numGenerations').node() as HTMLInputElement).value);
-        
+
         if (!prompt.trim()) {
             alert('Please enter a prompt');
+            return;
+        }
+
+        // Get Gemma generator
+        const gemmaGenerator = (window as any).gemmaGenerator;
+
+        if (!gemmaGenerator || !gemmaGenerator.isReady) {
+            alert('Gemma AI is not ready yet. Please wait for initialization to complete.');
             return;
         }
 
@@ -827,35 +829,33 @@ class LLMWordGraphExact {
         this.generationStartTime = performance.now();
         this.lastPrompt = prompt;
         this.updateButtonState();
-        
+
         // Clear previous timing display
-        d3.select('#timingDisplay').text('');
+        d3.select('#timingDisplay').text('Generating...');
 
         try {
-            // Use Voy-enhanced generation for more realistic results
-            const completions = await this.generateVoyEnhancedCompletions(prompt, numGenerations);
-            
+            console.log(`🤖 Generating ${numGenerations} variations with Gemma AI...`);
+
+            const completions = await gemmaGenerator.generateVariations(prompt, numGenerations, {
+                maxTokens: 50,
+                temperature: 0.9
+            });
+
             // Calculate generation time
             const generationTime = ((performance.now() - this.generationStartTime) / 1000).toFixed(2);
-            
+
             // Update UI with results
             this.displayGenerations(completions);
             this.renderGraph(completions);
-            
+
             // Show timing information
             d3.select('#timingDisplay').text(`${generationTime}s`);
-            
-            console.log(`⚡ Generated ${completions.length} completions in ${generationTime}s`);
+
+            console.log(`⚡ Generated ${completions.length} AI completions in ${generationTime}s`);
         } catch (error) {
-            console.error('Generation failed:', error);
-            // Fallback to standard generation
-            const fallbackCompletions = this.simulateLLMCompletions(prompt, numGenerations);
-            
-            const generationTime = ((performance.now() - this.generationStartTime) / 1000).toFixed(2);
-            this.displayGenerations(fallbackCompletions);
-            this.renderGraph(fallbackCompletions);
-            
-            d3.select('#timingDisplay').text(`${generationTime}s (fallback)`);
+            console.error('❌ Gemma generation failed:', error);
+            alert('Generation failed: ' + (error as Error).message);
+            d3.select('#timingDisplay').text('Failed');
         } finally {
             // Reset generation state
             this.isGenerating = false;
@@ -1018,27 +1018,20 @@ class LLMWordGraphExact {
 
     private loadRandomSample() {
         const prompts = [
-            "Artificial intelligence will",
-            "Machine learning can",
-            "Deep neural networks enable",
-            "Quantum computing might",
-            "Renewable energy systems will",
-            "Space exploration allows us to",
-            "Gene editing technology could",
-            "Virtual reality experiences will",
-            "Autonomous vehicles can",
-            "Blockchain technology will",
-            "Climate change mitigation requires",
-            "Scientific research demonstrates that",
-            "Advanced robotics will",
-            "Sustainable agriculture practices can",
-            "Ocean conservation efforts will"
+            "The future of artificial intelligence will",
+            "Climate change is caused by",
+            "The benefits of regular exercise include",
+            "Quantum computing will revolutionize",
+            "Space exploration helps us",
+            "The impact of social media on",
+            "Renewable energy sources are",
+            "Machine learning can improve"
         ];
-        
+
         const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
         (d3.select('#promptInput').node() as HTMLInputElement).value = randomPrompt;
         this.updateButtonState(); // Update button appearance for new prompt
-        this.generateLLMOutputs();
+        // Don't auto-generate - let user click Generate button
     }
 
     // Enhanced network IP detection

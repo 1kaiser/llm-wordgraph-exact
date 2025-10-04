@@ -53,3 +53,11 @@ pids
 
 # Optional eslint cache
 .eslintcache
+
+# Playwright test results
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Transformers cache
+.transformers-cache/

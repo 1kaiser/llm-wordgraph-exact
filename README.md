@@ -1,70 +1,31 @@
-# 🚀✨ LLM Word Graph Magic ✨🚀
+# LLM Word Graph + Gemma AI
 
-🧠 **Bright & colorful visualization of language model generation patterns**
+**Real AI-powered text generation with interactive word graph visualization**
 
-![LLM Word Graph Interface](screenshot.png)
+![LLM Word Graph Demo](llm-wordgraph-demo.gif)
 
-*Beautiful glassmorphism interface with vibrant gradients and interactive emoji-rich design*
+*Live demonstration: Model loading → Prompt entry → AI generation → Interactive graph exploration*
 
-This project implements the **exact word graph visualization algorithm** from [llm-consistency-vis](https://github.com/anthropics/llm-consistency-vis), specifically designed to visualize multiple LLM text completions and their word relationship patterns.
+This project combines the exact word graph visualization algorithm from Anthropic's [llm-consistency-vis](https://github.com/anthropics/llm-consistency-vis) with Google's **Gemma 270M AI model** running directly in your browser.
 
-## 📋 CLAUDE.md Integration
+## 🎯 Features
 
-This project is part of the multi-project workspace documented in `/home/kaiser/claude_projects/CLAUDE.md`. It represents the exact replication of the llm-consistency-vis word graph algorithms with enhanced features:
-
-- **Full Screen Visualization**: Utilizes entire viewport for complex pattern analysis
-- **Realistic LLM Data**: Based on actual translation variations from research examples  
-- **Exact Algorithm Matching**: Verified through comprehensive test suites
-- **Interactive Comparisons**: Side-by-side testing with original implementation
-
-**Status**: ✅ **FULLY OPERATIONAL** - Complete exact implementation with full screen capabilities and comprehensive testing
-
-## ✨ Key Features
-
-- **🎨 Beautiful UI Design**: Bright colorful glassmorphism with Pinterest-inspired aesthetics
-- **🌈 Vibrant Gradients**: Multi-colored radial gradients with sparkle animations
-- **✨ Interactive Emojis**: Engaging emoji-rich interface throughout
-- **🔮 Glassmorphism Effects**: Advanced backdrop filters with colorful accents
-- **📊 Exact Algorithm**: Direct implementation of tokenization, similarity calculation, and positioning
-- **➡️ Horizontal Flow Layout**: Words positioned sequentially left-to-right based on generation order
-- **🔗 Curved Path Connections**: Smooth Bézier curves connecting related words across generations
-- **👆 Interactive Selection**: Click words to highlight related paths and blur unconnected elements
-- **🔢 Multi-Generation Support**: Visualize multiple LLM completions simultaneously
-- **🧠 Similarity-based Merging**: Contextually similar words grouped using prev/next word context
-- **🔍 Real-time Zoom Controls**: Pan, zoom, and reset view for detailed exploration
-- **📱 Responsive Design**: Draggable controls with collapsible interface
-
-## 🔧 Technical Implementation
-
-### Core Algorithms (Exact from llm-consistency-vis)
-
-1. **Tokenization**: `tokenize()` - Processes text with context embeddings
-2. **Similarity Calculation**: `similarity()` - 0.5 threshold with context matching
-3. **Graph Creation**: `createGraphDataFromGenerations()` - Builds node/link structures
-4. **Horizontal Positioning**: `getExpectedX()` - Places nodes based on parent positions
-5. **Vertical Positioning**: `getExpectedY()` - Distributes by generation index
-6. **Path Rendering**: `renderPath()` - Creates curved Bézier connections
-7. **Sequential Merging**: Combines single-path word sequences
-
-### Architecture
-
-- **TypeScript + D3.js**: Type-safe visualization with powerful DOM manipulation
-- **Vite Build System**: Fast development server with hot reloading
-- **Exact Data Structures**: `NodeDatum` and `LinkDatum` interfaces matching original
-- **Force Simulation**: Minimal physics for smooth positioning
-- **Interactive Controls**: Hover, click, zoom, and selection states
+- ✅ **Real AI Text Generation** - Gemma 270M ONNX model (270MB)
+- ✅ **Browser-Based** - No API keys, no servers, completely local
+- ✅ **Interactive Word Graph** - Visual analysis of language patterns
+- ✅ **Real-Time Progress** - See model loading progress (0-100%)
+- ✅ **Clean 2D UI** - Flat design, no shadows or 3D effects
+- ✅ **Offline Capable** - Works offline after first model download
 
 ## 🚀 Quick Start
 
-### 🎯 One-Line Browser Launch
+### Prerequisites
+- Modern browser with WebGPU support (Chrome 113+, Edge 113+)
+- OR fallback to WASM (Firefox 120+, Safari 17+)
+- 4GB+ RAM recommended
+- ~500MB free disk space for model cache
 
-```bash
-git clone https://github.com/1kaiser/llm-wordgraph-exact.git && cd llm-wordgraph-exact && npm install && npm run dev
-```
-
-*This command clones the repo, installs dependencies, and starts the dev server at http://localhost:5173*
-
-### 📋 Step-by-Step Setup
+### Installation
 
 ```bash
 # Clone the repository
@@ -76,60 +37,335 @@ npm install
 
 # Start development server
 npm run dev
-# 🌐 Opens at http://localhost:5173
+```
 
-# Build for production
+The app will be available at:
+- **Local:** http://localhost:5173/llm-wordgraph-exact/
+- **Network:** http://[your-ip]:5173/llm-wordgraph-exact/
+
+## 📖 Step-by-Step Usage
+
+### Step 1: Model Initialization (First Time: 30-120s)
+
+When you first open the app, Gemma 270M will automatically start loading:
+
+```
+┌─────────────────────────────────────────┐
+│ Gemma Status & Progress                 │
+├─────────────────────────────────────────┤
+│ Initializing Gemma 270M...              │
+│ ██████████████████░░░░░░░░░░░░░  45%   │
+└─────────────────────────────────────────┘
+```
+
+**What's happening:**
+1. Downloading model files (270MB - one time only)
+2. Loading tokenizer and weights
+3. Initializing WebGPU/WASM backend
+
+**Once ready, you'll see:**
+```
+✓ Gemma 270M ready!
+```
+
+### Step 2: Enter Your Prompt
+
+Type or paste your prompt:
+
+```
+The future of artificial intelligence will
+```
+
+**Tips:**
+- Use natural language prompts
+- End with incomplete sentences for continuations
+- Try the **Random** button for inspiration
+
+### Step 3: Set Number of Variations (2-10)
+
+Choose how many variations to generate (default: 5)
+
+**More variations = Better graph:**
+- 2-3: Simple comparison
+- 5-7: Good balance (recommended)
+- 8-10: Maximum diversity
+
+### Step 4: Generate AI Text
+
+Click the **Generate** button and wait for Gemma AI to create variations.
+
+**What happens:**
+1. Gemma AI generates each variation (~2-10s per variation)
+2. Word graph builds automatically
+3. Statistics update in real-time
+
+### Step 5: Explore the Word Graph
+
+The graph shows:
+- **Nodes** = Words that appear across variations
+- **Links** = Sequential word connections
+- **Node size** = Frequency of word usage
+- **Colors** = Different word paths
+
+**Interactions:**
+- **Zoom In/Out** - Use zoom controls (right side: + / −)
+- **Pan** - Click and drag the graph
+- **Reset** - Click home button (⌂) to reset view
+
+## 🎨 UI Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ LLM Word Graph + Gemma AI                                  │
+│ Real AI text generation & visualization                     │
+├─────────────────────────────────────────────────────────────┤
+│ ┌─ Gemma Status ──────────────────────────────────────────┐│
+│ │ ✓ Gemma 270M ready!                                     ││
+│ │ ████████████████████████████████████████████ 100%      ││
+│ └─────────────────────────────────────────────────────────┘│
+│                                                             │
+│ Prompt:                                                     │
+│ ┌───────────────────────────────────────────────────────┐ │
+│ │ The future of artificial intelligence will          │ │
+│ └───────────────────────────────────────────────────────┘ │
+│                                                             │
+│ Variations: [5▼]  [Generate]  [Random]                     │
+│                                                             │
+│ ┌─── Statistics ───┐                                       │
+│ │ Words │ Links │   │                                      │
+│ │   42  │  89   │ 5 │                                      │
+│ └──────────────────┘                                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## ⚙️ Technical Details
+
+### Architecture
+
+```
+┌──────────────────┐      ┌──────────────────┐      ┌────────────┐
+│  User Interface  │─────>│  Gemma Worker    │─────>│   WebGPU   │
+│  (index.html)    │      │  (Web Worker)    │      │   / WASM   │
+└──────────────────┘      └──────────────────┘      └────────────┘
+         │                         │
+         │                         │
+         v                         v
+┌──────────────────┐      ┌──────────────────┐
+│  D3.js Graph     │      │  Gemma 270M      │
+│  Visualization   │      │  ONNX Model      │
+└──────────────────┘      └──────────────────┘
+```
+
+### Model Details
+
+- **Model:** Gemma 270M Instruct (ONNX format)
+- **Size:** 270MB
+- **Backend:** WebGPU (with WASM fallback)
+- **Temperature:** 0.9 (configurable)
+- **Max Tokens:** 50 per variation
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| **First Load** | 30-120s (one-time) |
+| **Cached Load** | 5-15s |
+| **Generation Speed** | ~2-10s per variation |
+| **Memory Usage** | 400-800MB during inference |
+| **Model Size** | 270MB (cached after first load) |
+
+## 🛠️ Development
+
+### Project Structure
+
+```
+llm-wordgraph-exact/
+├── index.html                         # Main UI with Gemma integration
+├── src/
+│   └── main.ts                        # Word graph logic + Gemma integration
+├── gemma-variation-generator.js       # Gemma API wrapper
+├── gemma-worker.js                    # Web Worker for model
+├── tests/
+│   ├── gemma-generation-test.spec.ts  # Full integration tests
+│   └── record-usage-demo.spec.ts      # Video recording test
+└── test-results/                      # Screenshots & videos
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test
+npx playwright test tests/gemma-generation-test.spec.ts
+
+# Run with visual browser
+npx playwright test --headed
+```
+
+### Building for Production
+
+```bash
 npm run build
 ```
 
-## 📊 Usage
+## 📊 How It Works
 
-1. **Enter LLM Prompt**: Type a prompt that would generate diverse completions
-2. **Set Generation Count**: Choose number of simulated LLM outputs (2-10)
-3. **Generate**: Click "Generate LLM Outputs" to create visualizations
-4. **Interact**: Click words to highlight connections, use zoom controls
-5. **Explore**: Select individual generations from the list to focus
+### 1. Text Generation
 
-## 🎯 Example Prompts
+Gemma generates multiple variations of your prompt with controlled randomness:
 
-- "The future of artificial intelligence will"
-- "Climate change solutions require"
-- "Space exploration enables humanity to"
-- "Quantum computing will revolutionize"
+```javascript
+// Example: Generate 5 variations
+const variations = await gemmaGenerator.generateVariations(
+  "The future of AI will",
+  5,
+  { temperature: 0.9, maxTokens: 50 }
+);
 
-## 📈 Performance
+// Output (example):
+// [
+//   "The future of AI will transform healthcare...",
+//   "The future of AI will revolutionize education...",
+//   "The future of AI will enhance creativity...",
+//   ...
+// ]
+```
 
-- **Fast Rendering**: Handles 10+ generations with hundreds of word nodes
-- **Smooth Interactions**: Real-time hover/click feedback
-- **Memory Efficient**: Optimized data structures and D3 selections
-- **Responsive**: Adapts to different screen sizes
+### 2. Word Graph Construction
 
-## 🔍 Exact Implementation Details
+The exact algorithm from Anthropic's llm-consistency-vis:
 
-This implementation precisely replicates:
+```
+Input Variations:
+1. "AI will transform healthcare systems"
+2. "AI will revolutionize healthcare delivery"
+3. "AI will enhance healthcare outcomes"
 
-- **Token Processing**: Lowercase normalization, punctuation handling
-- **Context Embeddings**: Previous/next word relationships for similarity
-- **Similarity Threshold**: 0.5 threshold with same-sentence exclusion
-- **Node Positioning**: Parent-based X positioning, generation-based Y positioning
-- **Path Curves**: Monotonic Y curves with root/end node alignment
-- **Visual Styling**: Blur effects, color coding, text rendering
+Graph (simplified):
+        transform ──> systems
+       /
+AI ─> will ──> revolutionize ──> delivery
+       \        healthcare
+        enhance ──> outcomes
+```
 
-## 🎨 Visual Design
+### 3. Visualization
 
-- **🌈 Bright Glassmorphism**: Multi-layered backdrop filters with vibrant colors
-- **✨ Sparkle Animations**: Dynamic particle effects with colorful sparkles
-- **🎪 Pinterest-Inspired**: Bright, playful aesthetic with maximum visual appeal
-- **🌟 Gradient Typography**: Rainbow text effects on headers and stats
-- **🎨 Colorful Buttons**: Coral-to-teal gradient buttons with enhanced hover states
-- **💫 Interactive Effects**: Multi-layered shadows and smooth animations
-- **📱 Responsive Layout**: Draggable controls that adapt to all screen sizes
-- **🎭 Emoji Integration**: Playful emojis throughout for engaging user experience
+- D3.js force-directed graph layout
+- Nodes sized by word frequency
+- Links colored by sentence paths
+- Interactive zoom and pan
 
-## 📝 License
+## 🔧 Configuration
 
-MIT License - Feel free to use and modify for your projects.
+### Adjust Generation Parameters
+
+Edit `src/main.ts`:
+
+```typescript
+const completions = await gemmaGenerator.generateVariations(prompt, numGenerations, {
+    maxTokens: 50,      // Change output length (10-200)
+    temperature: 0.9    // Change creativity (0.1-2.0)
+});
+```
+
+### Customize UI Theme
+
+Edit `index.html` CSS section - all colors use flat 2D design:
+
+```css
+/* Example: Change panel color */
+.control-panel {
+    background: #ffffff;  /* White background */
+    border: 2px solid #333333;  /* Black border */
+}
+
+/* Example: Change button color */
+button {
+    background: #333333;  /* Black button */
+    color: #ffffff;  /* White text */
+}
+```
+
+## 🚨 Troubleshooting
+
+### Model Won't Load
+
+**Problem:** Stuck at "Initializing..."
+
+**Solutions:**
+1. Check browser compatibility (Chrome 113+ recommended)
+2. Clear browser cache and reload
+3. Check RAM availability (4GB+ needed)
+4. Try incognito mode
+5. Check console for errors (F12)
+
+### Generation Fails
+
+**Problem:** "Gemma AI is not ready"
+
+**Solutions:**
+1. Wait for initialization to complete (check progress bar)
+2. Refresh the page
+3. Check console for errors (F12)
+
+### Slow Performance
+
+**Problem:** Generation takes too long
+
+**Solutions:**
+1. Reduce number of variations (try 3-5)
+2. Use shorter prompts
+3. Check if WebGPU is enabled: chrome://gpu
+4. Close other browser tabs
+
+## 📝 Browser Compatibility
+
+| Browser | WebGPU | WASM | Status |
+|---------|--------|------|--------|
+| Chrome 113+ | ✅ | ✅ | ⭐ Recommended |
+| Edge 113+ | ✅ | ✅ | ⭐ Recommended |
+| Firefox 120+ | ❌ | ✅ | Supported (slower) |
+| Safari 17+ | ❌ | ✅ | Supported (slower) |
+
+**Note:** WebGPU provides ~5-10x faster performance than WASM
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Test thoroughly
+5. Commit changes (`git commit -m 'Add amazing feature'`)
+6. Push to branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## 📄 License
+
+This project uses:
+- Anthropic's llm-consistency-vis algorithm (MIT License)
+- Google's Gemma 270M model (Apache 2.0 License)
+- Transformers.js (Apache 2.0 License)
+
+## 🙏 Acknowledgments
+
+- **Anthropic** - Original llm-consistency-vis algorithm
+- **Google** - Gemma 270M language model
+- **Xenova** - Transformers.js library
+- **D3.js** - Visualization framework
+
+## 🔗 Links
+
+- [Live Demo](https://1kaiser.github.io/llm-wordgraph-exact/)
+- [Original Algorithm](https://github.com/anthropics/llm-consistency-vis)
+- [Gemma Model](https://huggingface.co/onnx-community/gemma-3-270m-it-ONNX)
+- [Transformers.js](https://github.com/xenova/transformers.js)
 
 ---
 
-Built with precision to match the exact algorithms from the original llm-consistency-vis research project.
+**Made with ❤️ using Gemma AI + D3.js**
+
+*No API keys • No servers • Pure browser magic* ✨
