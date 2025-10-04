@@ -70180,15 +70180,22 @@ If a question does not make any sense, or is not factually coherent, explain why
       return d;
     }
     displayGenerations(e) {
-      const t = select("#generationsSection"), s = select("#generationsList");
-      select("#totalCount").text(`(${e.length})`), s.selectAll("*").remove();
-      const l = s.selectAll(".generation-item").data(e).enter().append("div").attr("class", "generation-item").on("click", (f, d) => {
-        const w = select(f.currentTarget).classed("selected");
-        selectAll(".generation-item").classed("selected", false), w ? this.renderGraph(e) : (select(f.currentTarget).classed("selected", true), this.renderGraph([
-          d
-        ]));
+      const t = select("#outputsSection"), s = select("#outputsContent"), l = select("#outputsCount");
+      t.style("display", "block"), l.text(e.length), s.selectAll("*").remove(), s.selectAll(".output-item").data(e).enter().append("div").attr("class", "output-item").each(function(g, _) {
+        const h = select(this);
+        h.append("span").attr("class", "output-number").text(`${_ + 1}.`), h.append("span").text(g);
       });
-      l.append("div").attr("class", "generation-number").text((f, d) => `${d + 1}`), l.append("div").style("padding-right", "25px").text((f) => f), t.classed("open", true);
+      const d = select("#generationsSection"), w = select("#generationsList");
+      if (!d.empty()) {
+        select("#totalCount").text(`(${e.length})`), w.selectAll("*").remove();
+        const g = w.selectAll(".generation-item").data(e).enter().append("div").attr("class", "generation-item").on("click", (_, h) => {
+          const r = select(_.currentTarget).classed("selected");
+          selectAll(".generation-item").classed("selected", false), r ? this.renderGraph(e) : (select(_.currentTarget).classed("selected", true), this.renderGraph([
+            h
+          ]));
+        });
+        g.append("div").attr("class", "generation-number").text((_, h) => `${h + 1}`), g.append("div").style("padding-right", "25px").text((_) => _), d.classed("open", true);
+      }
     }
     zoom(e) {
       const t = select("#graph"), s = t.node().__zoom__;
