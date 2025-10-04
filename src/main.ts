@@ -980,42 +980,73 @@ class LLMWordGraphExact {
     }
 
     private displayGenerations(generations: string[]) {
-        const section = d3.select('#generationsSection');
-        const list = d3.select('#generationsList');
-        
-        d3.select('#totalCount').text(`(${generations.length})`);
-        
-        list.selectAll('*').remove();
-        
-        const items = list.selectAll('.generation-item')
+        // Update outputs section
+        const outputsSection = d3.select('#outputsSection');
+        const outputsContent = d3.select('#outputsContent');
+        const outputsCount = d3.select('#outputsCount');
+
+        // Show section and update count
+        outputsSection.style('display', 'block');
+        outputsCount.text(generations.length);
+
+        // Clear previous content
+        outputsContent.selectAll('*').remove();
+
+        // Add output items
+        const items = outputsContent.selectAll('.output-item')
             .data(generations)
             .enter()
             .append('div')
-            .attr('class', 'generation-item')
-            .on('click', (event, d) => {
-                const isSelected = d3.select(event.currentTarget).classed('selected');
-                d3.selectAll('.generation-item').classed('selected', false);
-                
-                if (!isSelected) {
-                    d3.select(event.currentTarget).classed('selected', true);
-                    // Re-render with focus on selected generation
-                    this.renderGraph([d]);
-                } else {
-                    // Re-render with all generations if deselecting
-                    this.renderGraph(generations);
-                }
-            });
+            .attr('class', 'output-item');
 
-        items.append('div')
-            .attr('class', 'generation-number')
-            .text((d, i) => `${i + 1}`);
+        items.each(function(d, i) {
+            const item = d3.select(this);
+            item.append('span')
+                .attr('class', 'output-number')
+                .text(`${i + 1}.`);
+            item.append('span')
+                .text(d);
+        });
 
-        items.append('div')
-            .style('padding-right', '25px') // Make room for number
-            .text(d => d);
-            
-        // Auto-expand the list when generations are added
-        section.classed('open', true);
+        // Legacy support - check if old sections exist
+        const section = d3.select('#generationsSection');
+        const list = d3.select('#generationsList');
+
+        if (!section.empty()) {
+            d3.select('#totalCount').text(`(${generations.length})`);
+
+            list.selectAll('*').remove();
+
+            const legacyItems = list.selectAll('.generation-item')
+                .data(generations)
+                .enter()
+                .append('div')
+                .attr('class', 'generation-item')
+                .on('click', (event, d) => {
+                    const isSelected = d3.select(event.currentTarget).classed('selected');
+                    d3.selectAll('.generation-item').classed('selected', false);
+
+                    if (!isSelected) {
+                        d3.select(event.currentTarget).classed('selected', true);
+                        // Re-render with focus on selected generation
+                        this.renderGraph([d]);
+                    } else {
+                        // Re-render with all generations if deselecting
+                        this.renderGraph(generations);
+                    }
+                });
+
+            legacyItems.append('div')
+                .attr('class', 'generation-number')
+                .text((d, i) => `${i + 1}`);
+
+            legacyItems.append('div')
+                .style('padding-right', '25px') // Make room for number
+                .text(d => d);
+
+            // Auto-expand the list when generations are added
+            section.classed('open', true);
+        }
     }
 
     // Zoom controls

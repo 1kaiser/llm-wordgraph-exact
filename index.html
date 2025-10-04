@@ -67,6 +67,80 @@
             cursor: grabbing;
         }
 
+        /* Generated outputs section - collapsible */
+        .outputs-section {
+            margin-top: 15px;
+            border: 2px solid #000000;
+            background: #ffffff;
+        }
+
+        .outputs-header {
+            padding: 10px;
+            background: #000000;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .outputs-header:hover {
+            background: #333333;
+        }
+
+        .outputs-toggle {
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+
+        .outputs-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .outputs-content {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            display: block;
+        }
+
+        .outputs-content.collapsed {
+            display: none;
+        }
+
+        .output-item {
+            padding: 8px;
+            margin-bottom: 6px;
+            border: 1px solid #000000;
+            background: #ffffff;
+            font-size: 0.85em;
+            line-height: 1.4;
+            cursor: text;
+            user-select: text;
+            word-wrap: break-word;
+        }
+
+        .output-item:hover {
+            background: #f5f5f5;
+        }
+
+        .output-number {
+            font-weight: 700;
+            color: #000000;
+            margin-right: 5px;
+        }
+
+        .outputs-empty {
+            padding: 20px;
+            text-align: center;
+            color: #666666;
+            font-style: italic;
+            font-size: 0.85em;
+        }
+
         .panel-header {
             text-align: center;
             margin-bottom: 15px;
@@ -400,6 +474,17 @@
             </div>
         </div>
 
+        <!-- Generated Outputs - Collapsible Section -->
+        <div class="outputs-section" id="outputsSection" style="display: none;">
+            <div class="outputs-header" id="outputsHeader">
+                <span>Generated Outputs (<span id="outputsCount">0</span>)</span>
+                <span class="outputs-toggle" id="outputsToggle">▼</span>
+            </div>
+            <div class="outputs-content" id="outputsContent">
+                <div class="outputs-empty">No outputs generated yet</div>
+            </div>
+        </div>
+
         <!-- Drag handle - red dot at bottom right corner -->
         <div class="drag-handle" title="Drag to move panel"></div>
     </div>
@@ -480,6 +565,22 @@
         document.getElementById('randomBtn').addEventListener('click', () => {
             const prompt = randomPrompts[Math.floor(Math.random() * randomPrompts.length)];
             document.getElementById('promptInput').value = prompt;
+        });
+
+        // Collapsible outputs section
+        document.getElementById('outputsHeader').addEventListener('click', () => {
+            const content = document.getElementById('outputsContent');
+            const toggle = document.getElementById('outputsToggle');
+
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                toggle.classList.remove('collapsed');
+                toggle.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                toggle.classList.add('collapsed');
+                toggle.textContent = '▶';
+            }
         });
     </script>
 </body>
