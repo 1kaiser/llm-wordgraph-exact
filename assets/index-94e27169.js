@@ -69791,15 +69791,15 @@ If a question does not make any sense, or is not factually coherent, explain why
     }
     initializeDraggablePanel() {
       select(".control-panel");
-      const e = select(".panel-header");
-      e.style("cursor", "move");
-      const t = drag().on("start", function(s) {
-        select(this.parentElement).style("z-index", "1001"), e.style("cursor", "grabbing");
+      const e = select(".drag-handle"), t = drag().on("start", function(s) {
+        const l = this.parentElement;
+        select(l).style("z-index", "1001");
       }).on("drag", function(s) {
-        const l = select(this.parentElement), f = parseInt(l.style("left")) || 20, d = parseInt(l.style("top")) || 20, w = f + s.dx, g = d + s.dy, _ = this.parentElement.offsetWidth, h = this.parentElement.offsetHeight, r = window.innerWidth - _, n = window.innerHeight - h, u = Math.max(0, Math.min(w, r)), p = Math.max(0, Math.min(g, n));
-        l.style("left", u + "px"), l.style("top", p + "px");
+        const l = this.parentElement, f = select(l), d = parseInt(f.style("left")) || 20, w = parseInt(f.style("top")) || 20, g = d + s.dx, _ = w + s.dy, h = l.offsetWidth, r = l.offsetHeight, n = window.innerWidth - h, u = window.innerHeight - r, p = Math.max(0, Math.min(g, n)), M = Math.max(0, Math.min(_, u));
+        f.style("left", p + "px"), f.style("top", M + "px");
       }).on("end", function() {
-        e.style("cursor", "move");
+        const s = this.parentElement;
+        select(s).style("z-index", "1000");
       });
       e.call(t);
     }
