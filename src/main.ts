@@ -100,24 +100,21 @@ class LLMWordGraphExact {
         });
     }
 
-    // Make control panel draggable using D3.js
+    // Make control panel draggable using D3.js with red dot handle
     private initializeDraggablePanel() {
         const panel = d3.select('.control-panel');
-        const header = d3.select('.panel-header');
-
-        // Add cursor style to indicate draggable area
-        header.style('cursor', 'move');
+        const dragHandle = d3.select('.drag-handle');
 
         // Create drag behavior
         const drag = d3.drag<HTMLDivElement, unknown>()
             .on('start', function(event) {
                 // Bring panel to front
-                d3.select(this.parentElement as HTMLElement).style('z-index', '1001');
-                // Change cursor
-                header.style('cursor', 'grabbing');
+                const panelElement = this.parentElement as HTMLElement;
+                d3.select(panelElement).style('z-index', '1001');
             })
             .on('drag', function(event) {
-                const panel = d3.select(this.parentElement as HTMLElement);
+                const panelElement = this.parentElement as HTMLElement;
+                const panel = d3.select(panelElement);
 
                 // Get current position
                 const currentLeft = parseInt(panel.style('left')) || 20;
@@ -128,8 +125,8 @@ class LLMWordGraphExact {
                 const newTop = currentTop + event.dy;
 
                 // Apply constraints to keep panel on screen
-                const panelWidth = (this.parentElement as HTMLElement).offsetWidth;
-                const panelHeight = (this.parentElement as HTMLElement).offsetHeight;
+                const panelWidth = panelElement.offsetWidth;
+                const panelHeight = panelElement.offsetHeight;
                 const maxLeft = window.innerWidth - panelWidth;
                 const maxTop = window.innerHeight - panelHeight;
 
@@ -141,12 +138,13 @@ class LLMWordGraphExact {
                 panel.style('top', constrainedTop + 'px');
             })
             .on('end', function() {
-                // Restore cursor
-                header.style('cursor', 'move');
+                // Reset z-index
+                const panelElement = this.parentElement as HTMLElement;
+                d3.select(panelElement).style('z-index', '1000');
             });
 
-        // Apply drag behavior to header only
-        header.call(drag as any);
+        // Apply drag behavior to red dot handle only
+        dragHandle.call(drag as any);
     }
 
     // Initialize Voy WASM with proper HuggingFace embeddings
