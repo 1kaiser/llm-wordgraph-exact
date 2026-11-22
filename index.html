@@ -421,7 +421,7 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="/llm-wordgraph-exact/assets/index-42dd54ac.js"></script>
+  <script type="module" crossorigin src="/llm-wordgraph-exact/assets/index-72c19730.js"></script>
 </head>
 <body>
     <!-- Full screen graph -->
@@ -431,6 +431,13 @@
 
     <!-- Clean 2D control panel -->
     <div class="control-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid #000; font-size: 12px;">
+            <a href="https://1kaiser.github.io/" style="color: #000; font-weight: 700; text-decoration: none;">&larr; 1kaiser.github.io</a>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="https://github.com/1kaiser/llm-wordgraph-exact" target="_blank" rel="noopener" style="color: #000; text-decoration: underline;">GitHub</a>
+                <button id="refsToggleBtn" type="button" style="padding: 2px 8px; font-size: 11px;">References</button>
+            </div>
+        </div>
         <div class="panel-header">
             <h1>LLM Word Graph + Gemma AI</h1>
             <p>Real AI text generation & visualization</p>
@@ -536,6 +543,32 @@
                 toggle.textContent = '▶';
             }
         });
+    </script>
+
+    <div id="refsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; align-items: center; justify-content: center; padding: 16px;">
+        <div style="background: #fff; border: 2px solid #000; max-width: 560px; width: 100%; padding: 18px 20px; font-size: 13px; line-height: 1.6;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 10px;">
+                <strong>References &amp; Upstream Attribution</strong>
+                <button id="refsCloseBtn" type="button" style="padding: 3px 10px; font-size: 12px;">Close</button>
+            </div>
+            <ul style="padding-left: 18px; margin: 0;">
+                <li><strong>Word Graph Algorithm:</strong> Emily Reif, Deniz Nazarova, Jared Hwang, Claire Yang &mdash; <a href="https://github.com/EmilyReif/llm-consistency-vis" target="_blank" rel="noopener">EmilyReif/llm-consistency-vis</a> (Apache-2.0 License).</li>
+                <li><strong>Gemma 3 Technical Report:</strong> Gemma Team, Google DeepMind (2025). <a href="https://arxiv.org/abs/2503.19786" target="_blank" rel="noopener">arXiv:2503.19786</a> (<a href="https://huggingface.co/onnx-community/gemma-3-270m-it-ONNX" target="_blank" rel="noopener">gemma-3-270m-it-ONNX</a>).</li>
+                <li><strong>Sentence Embeddings &amp; Search:</strong> <code>Xenova/all-MiniLM-L6-v2</code> via <a href="https://huggingface.co/docs/transformers.js" target="_blank" rel="noopener">Transformers.js</a>, <a href="https://github.com/tantaraio/voy" target="_blank" rel="noopener">Voy WASM</a>, and <a href="https://d3js.org/" target="_blank" rel="noopener">D3.js v7</a>.</li>
+                <li><strong>Home:</strong> <a href="https://1kaiser.github.io/">1kaiser.github.io</a> &middot; <a href="https://github.com/1kaiser/llm-wordgraph-exact" target="_blank" rel="noopener">1kaiser/llm-wordgraph-exact</a>.</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const modal = document.getElementById('refsModal');
+            const openBtn = document.getElementById('refsToggleBtn');
+            const closeBtn = document.getElementById('refsCloseBtn');
+            if (!modal || !openBtn) return;
+            openBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
+            if (closeBtn) closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+        })();
     </script>
 </body>
 </html>
