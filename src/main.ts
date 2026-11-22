@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import { Voy as VoyClient } from "voy-search";
-import { pipeline, env } from '@xenova/transformers';
+import { pipeline, env } from '@huggingface/transformers';
 
 // Exact interfaces from llm-consistency-vis
 interface NodeDatum {
@@ -152,15 +152,15 @@ class LLMWordGraphExact {
         try {
             console.log('🚀 Initializing Voy WASM with HuggingFace embeddings...');
             
-            // Configure transformers to use local models and disable logging
-            env.allowRemoteModels = false;
-            env.allowLocalModels = true;
+            // Configure transformers for client-side remote/cached loading
+            env.allowRemoteModels = true;
+            env.allowLocalModels = false;
             env.useBrowserCache = true;
             
             // Initialize HuggingFace embeddings pipeline
             console.log('📦 Loading embeddings model (Xenova/all-MiniLM-L6-v2)...');
             this.embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
-                quantized: true,
+                dtype: 'q8',
                 revision: 'main',
             });
             

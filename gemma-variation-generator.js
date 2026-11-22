@@ -10,8 +10,6 @@
  *   const variations = await generator.generateVariations("Your prompt", 5);
  */
 
-import { pipeline, env } from '@huggingface/transformers';
-
 export class GemmaVariationGenerator {
   constructor() {
     this.worker = null;

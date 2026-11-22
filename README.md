@@ -6,7 +6,7 @@
 
 *Live demonstration: Model loading → Prompt entry → AI generation → Interactive graph exploration*
 
-This project combines the exact word graph visualization algorithm from Anthropic's [llm-consistency-vis](https://github.com/anthropics/llm-consistency-vis) with Google's **Gemma 270M AI model** running directly in your browser.
+This project combines the exact word graph visualization algorithm from Emily Reif et al.'s [llm-consistency-vis](https://github.com/EmilyReif/llm-consistency-vis) (Apache-2.0) with Google's **Gemma 3 270M ONNX** model running directly in your browser. Back to [1kaiser.github.io](https://1kaiser.github.io/).
 
 ## 🎯 Features
 
@@ -346,23 +346,24 @@ Contributions welcome! Please:
 ## 📄 License
 
 This project uses:
-- Anthropic's llm-consistency-vis algorithm (MIT License)
-- Google's Gemma 270M model (Apache 2.0 License)
-- Transformers.js (Apache 2.0 License)
+- Emily Reif et al.'s [`EmilyReif/llm-consistency-vis`](https://github.com/EmilyReif/llm-consistency-vis) algorithm (Apache 2.0 License)
+- Google DeepMind Gemma 3 (`arXiv:2503.19786`) / Gemma 3 270M ONNX
+- Hugging Face Transformers.js (Apache 2.0 License)
 
 ## 🙏 Acknowledgments
 
-- **Anthropic** - Original llm-consistency-vis algorithm
-- **Google** - Gemma 270M language model
-- **Xenova** - Transformers.js library
-- **D3.js** - Visualization framework
+- **Emily Reif, Deniz Nazarova, Jared Hwang, Claire Yang** — Original `llm-consistency-vis` word graph visualization
+- **Google DeepMind** — Gemma 3 270M language model
+- **Hugging Face** — Transformers.js library
+- **D3.js & Voy** — Visualization and WASM vector similarity
 
 ## 🔗 Links
 
+- [Back to 1kaiser.github.io](https://1kaiser.github.io/)
 - [Live Demo](https://1kaiser.github.io/llm-wordgraph-exact/)
-- [Original Algorithm](https://github.com/anthropics/llm-consistency-vis)
+- [Original Algorithm (EmilyReif/llm-consistency-vis)](https://github.com/EmilyReif/llm-consistency-vis)
 - [Gemma Model](https://huggingface.co/onnx-community/gemma-3-270m-it-ONNX)
-- [Transformers.js](https://github.com/xenova/transformers.js)
+- [Transformers.js](https://github.com/huggingface/transformers.js)
 
 ---
 

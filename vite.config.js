@@ -26,6 +26,9 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['d3'],
-    exclude: ['voy-search']
+    exclude: ['voy-search', '@huggingface/transformers']
+  },
+  worker: {
+    format: 'es'
   }
 })
